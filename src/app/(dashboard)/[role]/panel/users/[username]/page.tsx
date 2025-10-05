@@ -20,8 +20,22 @@ import { Button } from "@/components/ui/button";
 import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
+import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
-const SingleUserPage = () => {
+export default async function SingleUserPage({
+  params,
+  req,
+}: {
+  params: Promise<{ role: string; username: string }>;
+  req: NextRequest;
+}) {
+  const { role, username } = await params;
+  console.log("role | username: " + role + username);
+
+  // const token = cookies.toString .get("auth_token")?.value;
+  // console.log("token: " + cookies.toString);
+
   return (
     <div className="">
       <Breadcrumb>
@@ -126,11 +140,11 @@ const SingleUserPage = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Username:</span>
-                <span>john.doe</span>
+                <span>{username}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Email:</span>
-                <span>john.doe@gmail.com</span>
+                <span>{username}@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Phone:</span>
@@ -142,7 +156,7 @@ const SingleUserPage = () => {
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Role:</span>
-                <Badge>Admin</Badge>
+                <Badge>{role}</Badge>
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
@@ -181,6 +195,4 @@ const SingleUserPage = () => {
       </div>
     </div>
   );
-};
-
-export default SingleUserPage;
+}
