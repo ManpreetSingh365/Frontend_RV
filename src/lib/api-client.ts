@@ -1,3 +1,4 @@
+// src/lib/api-client.tsx
 import { env } from "./env";
 
 export class ApiError extends Error {
@@ -11,50 +12,75 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${env.BACKEND_PATH}${endpoint}`;
+  // ✅ Route auth requests through Next.js Route Handler
+  let url: string;
+
+  if (endpoint.startsWith("/api/v1/auth/")) {
+    // Auth endpoints go through Next.js Route Handler
+    const authPath = endpoint.replace("/api/v1/auth/", "");
+    url = `${env.FRONTEND_PATH}/api/auth/${authPath}`;
+  } else {
+    // Other endpoints go directly to backend
+    url = `${env.BACKEND_PATH}${endpoint}`;
+  }
 
   const config: RequestInit = {
     ...options,
-    credentials: "include", // ✅ Critical for cross-origin cookies
-    mode: "cors", // ✅ Explicit CORS mode
-    cache: "no-store", // ✅ Prevent caching authentication requests
+    credentials: "include", // ✅ Critical for cookie handling
+    mode: "cors",
+    cache: "no-store", // Prevent caching of auth requests
     headers: {
       "Content-Type": "application/json",
-      // Don't manually add cookies - browser handles this with credentials: include
       ...(options.headers || {}),
     },
   };
 
-  console.log(`🔄 Making ${config.method || "GET"} request to: ${url}`); // Debug log
+  console.log(`🔄 API Client: ${config.method || "GET"} ${url}`);
 
-  const response = await fetch(url, config);
+  try {
+    const response = await fetch(url, config);
 
-  // Log response headers for debugging
-  console.log(`📥 Response status: ${response.status}`);
-  console.log(
-    `📥 Response headers:`,
-    Object.fromEntries(response.headers.entries())
-  );
+    console.log(`📥 Response: ${response.status} ${response.statusText}`);
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new ApiError(
-      errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-      response.status,
-      errorData
-    );
+    // Log cookies for debugging
+    const cookieHeader = response.headers.get("set-cookie");
+    if (cookieHeader) {
+      console.log("🍪 Set-Cookie header present in response");
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        message: `HTTP ${response.status}: ${response.statusText}`,
+      }));
+
+      throw new ApiError(
+        errorData.message || `Request failed with status ${response.status}`,
+        response.status,
+        errorData
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    console.error("❌ Network error:", error);
+    throw new ApiError("Network error occurred", 0, error);
   }
-
-  return response.json();
 }
 
 export const apiClient = {
   get: async <T>(endpoint: string) =>
     apiRequest<T>(endpoint, { method: "GET" }),
+
   post: async <Req, Res>(endpoint: string, data: Req) =>
     apiRequest<Res>(endpoint, { method: "POST", body: JSON.stringify(data) }),
+
   put: async <Req, Res>(endpoint: string, data: Req) =>
     apiRequest<Res>(endpoint, { method: "PUT", body: JSON.stringify(data) }),
+
   delete: async <Res>(endpoint: string) =>
     apiRequest<Res>(endpoint, { method: "DELETE" }),
 };
