@@ -1,54 +1,34 @@
-//src/app/api/auth/login
+// src/app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
+export const runtime = "edge"; // ✅ Edge function for faster responses
 
-    console.log("🔄 Route Handler: Proxying login to Spring Boot");
+export async function POST(req: NextRequest) {
+  const body = await req.json();
 
-    // Forward to Spring Boot backend
-    const backendResponse = await fetch(
-      `${env.BACKEND_PATH}/api/v1/auth/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      }
-    );
+  // Forward login to Spring Boot backend
+  const backendRes = await fetch(`${env.BACKEND_PATH}/api/v1/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+    credentials: "include",
+  });
 
-    if (!backendResponse.ok) {
-      const errorData = await backendResponse.json().catch(() => ({
-        message: `Backend error: ${backendResponse.status}`,
-      }));
+  const data = await backendRes.json().catch(() => ({
+    message: `Backend error: ${backendRes.status}`,
+  }));
 
-      console.error(`❌ Backend error: ${backendResponse.status}`);
-      return NextResponse.json(errorData, { status: backendResponse.status });
-    }
-
-    const responseData = await backendResponse.json();
-    const setCookieHeader = backendResponse.headers.get("set-cookie");
-
-    console.log("✅ Backend login successful");
-    console.log(`🍪 Cookie to forward: ${setCookieHeader ? "Yes" : "No"}`);
-
-    // Create response and forward cookie
-    const response = NextResponse.json(responseData);
-
-    if (setCookieHeader) {
-      response.headers.set("Set-Cookie", setCookieHeader);
-      console.log("🔄 Cookie forwarded to browser");
-    }
-
-    return response;
-  } catch (error) {
-    console.error("❌ Route Handler error:", error);
-    return NextResponse.json(
-      { message: "Authentication service unavailable" },
-      { status: 500 }
-    );
+  if (!backendRes.ok) {
+    return NextResponse.json(data, { status: backendRes.status });
   }
+
+  // Forward cookies from backend if present
+  const response = NextResponse.json(data);
+  const cookie = backendRes.headers.get("set-cookie");
+  if (cookie) response.headers.set("Set-Cookie", cookie);
+
+  return response;
 }

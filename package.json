@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:clean": "rimraf .next && next dev",
     "build": "next build",
     "start": "next start",
+    "clean": "rimraf .next",
     "lint": "next lint"
   },
   "dependencies": {
@@ -30,6 +32,7 @@
     "date-fns": "^4.1.0",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.488.0",
     "next": "15.3.0",
     "next-themes": "^0.4.6",
@@ -53,6 +56,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

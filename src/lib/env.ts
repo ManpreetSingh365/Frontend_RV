@@ -6,12 +6,17 @@ const envSchema = object({
 });
 
 function validateEnv() {
-  const parsed = safeParse(envSchema, process.env);
+  const parsed = safeParse(envSchema, {
+    FRONTEND_PATH: process.env.NEXT_PUBLIC_FRONTEND_PATH,
+    BACKEND_PATH: process.env.NEXT_PUBLIC_BACKEND_PATH,
+  });
+
   if (!parsed.success) {
     throw new Error(
       `Invalid environment variables: ${JSON.stringify(parsed.issues)}`
     );
   }
+
   return parsed.output;
 }
 

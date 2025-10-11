@@ -1,4 +1,4 @@
-// src/lib/api-client.tsx
+// src/lib/api-client.ts
 import { env } from "./env";
 
 export class ApiError extends Error {
@@ -12,63 +12,38 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  // ✅ Route auth requests through Next.js Route Handler
-  let url: string;
-
-  if (endpoint.startsWith("/api/v1/auth/")) {
-    // Auth endpoints go through Next.js Route Handler
-    const authPath = endpoint.replace("/api/v1/auth/", "");
-    url = `${env.FRONTEND_PATH}/api/auth/${authPath}`;
-  } else {
-    // Other endpoints go directly to backend
-    url = `${env.BACKEND_PATH}${endpoint}`;
-  }
+  let url = endpoint.startsWith("/api/v1/auth/")
+    ? `${env.FRONTEND_PATH}/api/auth/${endpoint.replace("/api/v1/auth/", "")}`
+    : `${env.BACKEND_PATH}${endpoint}`;
 
   const config: RequestInit = {
     ...options,
-    credentials: "include", // ✅ Critical for cookie handling
+    credentials: "include",
     mode: "cors",
-    cache: "no-store", // Prevent caching of auth requests
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
   };
-
   console.log(`🔄 API Client: ${config.method || "GET"} ${url}`);
 
-  try {
-    const response = await fetch(url, config);
+  const res = await fetch(url, config);
+  console.log(`📥 Response: ${res.status} ${res.statusText}`);
 
-    console.log(`📥 Response: ${response.status} ${response.statusText}`);
-
-    // Log cookies for debugging
-    const cookieHeader = response.headers.get("set-cookie");
-    if (cookieHeader) {
-      console.log("🍪 Set-Cookie header present in response");
-    }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        message: `HTTP ${response.status}: ${response.statusText}`,
-      }));
-
-      throw new ApiError(
-        errorData.message || `Request failed with status ${response.status}`,
-        response.status,
-        errorData
-      );
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-
-    console.error("❌ Network error:", error);
-    throw new ApiError("Network error occurred", 0, error);
+  const cookieHeader = res.headers.get("set-cookie");
+  if (cookieHeader) {
+    console.log("🍪 Set-Cookie header present in response");
   }
+
+  const data = await res.json().catch(() => ({
+    message: `HTTP ${res.status}: ${res.statusText}`,
+  }));
+
+  if (!res.ok)
+    throw new ApiError(data.message || "Request failed", res.status, data);
+
+  return data;
 }
 
 export const apiClient = {

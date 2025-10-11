@@ -1,3 +1,4 @@
+// components/client-login-form.tsx
 "use client";
 
 import { useState } from "react";
@@ -5,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { safeParse } from "valibot";
 import { loginSchema } from "@/lib/valibot/schemas/loginSchema";
-import { env } from "@/lib/env";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -24,92 +25,59 @@ interface LoginFormValues {
   rememberMe?: boolean;
 }
 
-interface LoginState {
-  loading: boolean;
-  error: string | null;
-  success: boolean;
+interface LoginResponse {
+  message: string;
 }
 
 export function ClientLoginForm({ className }: React.ComponentProps<"div">) {
   const router = useRouter();
-  const [state, setState] = useState<LoginState>({
-    loading: false,
-    error: null,
-    success: false,
-  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const {
     register,
     handleSubmit,
-    setError,
-    clearErrors,
+    setError: setFormError,
     formState: { errors },
   } = useForm<LoginFormValues>();
 
   const onSubmit = async (values: LoginFormValues) => {
-    // Clear previous state
-    clearErrors();
-    setState({ loading: true, error: null, success: false });
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
 
-    // ✅ Client-side validation
+    // ✅ Client-side validation with Valibot
     const parsed = safeParse(loginSchema, values);
     if (!parsed.success) {
       parsed.issues?.forEach((issue) => {
         const key = issue.path?.[0] as unknown as keyof LoginFormValues;
         if (key) {
-          setError(key, { message: issue.message });
+          setFormError(key, { type: "manual", message: issue.message });
         }
       });
-      setState({ loading: false, error: null, success: false });
+      setLoading(false);
       return;
     }
 
     try {
-      console.log("🔐 Client: Starting login process");
+      // Call backend (Spring Boot sets HTTP-only cookie)
+      await apiClient.post<LoginFormValues, LoginResponse>(
+        "/api/v1/auth/login",
+        parsed.output
+      );
 
-      // ✅ Direct call to Route Handler from client - this will work!
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // ✅ Critical for cookie storage
-        body: JSON.stringify(parsed.output),
-      });
+      setSuccess(true);
 
-      console.log(`📥 Client: Response status ${response.status}`);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("✅ Client: Login successful, cookie should be stored");
-        
-        setState({ loading: false, error: null, success: true });
-        
-        // Small delay to show success message
-        setTimeout(() => {
-          router.push("/admin/panel");
-        }, 1000);
-        
-      } else {
-        const errorData = await response.json().catch(() => ({
-          message: "Login failed. Please check your credentials."
-        }));
-        
-        console.error("❌ Client: Login failed:", errorData);
-        setState({ 
-          loading: false, 
-          error: errorData.message || "Login failed", 
-          success: false 
-        });
-      }
-
-    } catch (error) {
-      console.error("❌ Client: Network error:", error);
-      setState({
-        loading: false,
-        error: "Network error. Please check your connection.",
-        success: false,
-      });
+      // ✅ Keep loading until redirect
+      setTimeout(() => {
+        router.push("/admin/panel"); // redirect to admin panel
+      }, 500); // optional small UX delay
+    } catch (err: any) {
+      setError(
+        err?.response?.message || "Login failed. Please check your credentials."
+      );
+      setLoading(false); // stop spinner on error
     }
   };
 
@@ -119,91 +87,91 @@ export function ClientLoginForm({ className }: React.ComponentProps<"div">) {
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
-              <div className="flex flex-col items-center gap-2 text-center mb-6">
+              <div className="flex flex-col items-center gap-2 text-center mb-2">
                 <h1 className="text-2xl font-bold">Welcome back 👋</h1>
-                <p className="text-muted-foreground text-balance">
+                <p className="text-muted-foreground">
                   Let's Hit the Road with RouteVision 🚚
                 </p>
               </div>
 
+              {/* Error */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 text-center text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
+
+              {/* Success */}
+              {success && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 text-center text-green-600 text-sm">
+                  ✅ Login successful! Redirecting...
+                </div>
+              )}
+
+              {/* Username */}
               <Field>
                 <FieldLabel htmlFor="username">Username 👤</FieldLabel>
                 <Input
                   id="username"
-                  {...register("username", {
-                    required: "Username is required",
-                  })}
+                  {...register("username")}
                   placeholder="Enter your username"
-                  disabled={state.loading}
+                  disabled={loading}
+                  aria-invalid={!!errors.username}
+                  aria-describedby="username-error"
                   autoComplete="username"
                 />
                 {errors.username && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p id="username-error" className="text-red-500 text-sm mt-1">
                     {errors.username.message}
                   </p>
                 )}
               </Field>
 
+              {/* Password */}
               <Field>
                 <FieldLabel htmlFor="password">Password 🔒</FieldLabel>
                 <Input
                   id="password"
                   type="password"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
+                  {...register("password")}
                   placeholder="Enter your password"
-                  disabled={state.loading}
+                  disabled={loading}
+                  aria-invalid={!!errors.password}
+                  aria-describedby="password-error"
                   autoComplete="current-password"
                 />
                 {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p id="password-error" className="text-red-500 text-sm mt-1">
                     {errors.password.message}
                   </p>
                 )}
               </Field>
 
+              {/* Remember Me */}
               <Field>
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     {...register("rememberMe")}
-                    disabled={state.loading}
+                    disabled={loading}
                     className="rounded border-gray-300"
                   />
                   <span>Remember Me for 7 days</span>
                 </label>
               </Field>
 
-              {/* ✅ Error Display */}
-              {state.error && (
-                <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                  <p className="text-red-600 text-sm text-center">
-                    {state.error}
-                  </p>
-                </div>
-              )}
-
-              {/* ✅ Success Display */}
-              {state.success && (
-                <div className="bg-green-50 border border-green-200 rounded-md p-3">
-                  <p className="text-green-600 text-sm text-center">
-                    ✅ Login successful! Redirecting to admin panel...
-                  </p>
-                </div>
-              )}
-
+              {/* Submit button */}
               <Field>
-                <Button 
-                  type="submit" 
-                  disabled={state.loading} 
+                <Button
+                  type="submit"
+                  disabled={loading}
                   className="w-full"
                   size="lg"
                 >
-                  {state.loading ? (
-                    <div className="flex items-center gap-2">
+                  {loading ? (
+                    <div className="flex items-center gap-2 justify-center">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Logging in...</span>
+                      Logging in...
                     </div>
                   ) : (
                     "Login 🚀"
@@ -213,6 +181,7 @@ export function ClientLoginForm({ className }: React.ComponentProps<"div">) {
             </FieldGroup>
           </form>
 
+          {/* Side image */}
           <div className="bg-muted relative hidden md:block">
             <Image
               src="/login-image.png"
@@ -225,10 +194,17 @@ export function ClientLoginForm({ className }: React.ComponentProps<"div">) {
         </CardContent>
       </Card>
 
+      {/* Footer */}
       <FieldDescription className="px-6 text-center text-sm text-muted-foreground">
         By clicking continue, you agree to our{" "}
-        <a href="#" className="underline hover:no-underline">Terms of Service</a>{" "}
-        and <a href="#" className="underline hover:no-underline">Privacy Policy</a>.
+        <a href="#" className="underline hover:no-underline">
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="#" className="underline hover:no-underline">
+          Privacy Policy
+        </a>
+        .
       </FieldDescription>
     </div>
   );

@@ -19,7 +19,7 @@ import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import AppLineChart from "@/components/AppLineChart";
+import AppLineChart from "@/components/chart/AppLineChart";
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
