@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
 
   // Forward login to Spring Boot backend
-  const backendRes = await fetch(`${env.BACKEND_PATH}/api/v1/auth/login`, {
+  const backendRes = await fetch(`${env.BACKEND_PATH}/portal/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
