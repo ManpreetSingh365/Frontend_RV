@@ -31,7 +31,7 @@ function log(level: "info" | "warn" | "error", message: string, meta?: any) {
 export async function getAuthToken(): Promise<string | null> {
   try {
     const cookieStore = await cookies();
-    const authCookie = cookieStore.get("auth_token");
+    const authCookie = cookieStore.get("access_token");
     if (!authCookie) {
       log("warn", "Auth cookie not found");
       return null;
@@ -98,13 +98,13 @@ export function decodeAuthPayload(token: string): AuthPayload | null {
 }
 
 /**
- * ✅ Client-side fallback to detect auth_token existence
+ * ✅ Client-side fallback to detect access_token existence
  * Cannot read httpOnly cookie value, only existence
  */
 export function checkClientAuth(): boolean {
   if (typeof document === "undefined") return false;
 
-  const exists = document.cookie.includes("auth_token=");
+  const exists = document.cookie.includes("access_token=");
   console.info("[AuthUtils] 🧭 Client auth cookie detected:", exists);
   return exists;
 }

@@ -13,7 +13,7 @@ export default async function AdminPanel() {
   const token = await getAuthToken();
 
   if (!token) {
-    console.warn("⛔ No valid auth_token found — redirecting to /login");
+    console.warn("⛔ No valid access_token found — redirecting to /login");
     redirect("/login");
   }
 

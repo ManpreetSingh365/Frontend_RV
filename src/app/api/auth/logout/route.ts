@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
   // ✅ Clear the cookie properly and safely
   response.cookies.set({
-    name: "auth_token",
+    name: "access_token",
     value: "",
     path: "/",
     httpOnly: true,

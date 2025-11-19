@@ -33,7 +33,7 @@ export default async function SingleUserPage({
   const { role, username } = await params;
   console.log("role | username: " + role + username);
 
-  // const token = cookies.toString .get("auth_token")?.value;
+  // const token = cookies.toString .get("access_token")?.value;
   // console.log("token: " + cookies.toString);
 
   return (
