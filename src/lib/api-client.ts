@@ -1,61 +1,88 @@
 // src/lib/api-client.ts
 import { env } from "./env";
-
-export class ApiError extends Error {
-  constructor(message: string, public status: number, public response?: any) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+import { ApiResponse, ApiErrorResponse, ApiError } from "./api/types";
 
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  let url = endpoint.startsWith("/api/v1/auth/")
-    ? `${env.FRONTEND_PATH}/api/auth/${endpoint.replace("/api/v1/auth/", "")}`
-    : `${env.BACKEND_PATH}${endpoint}`;
 
-  const config: RequestInit = {
-    ...options,
+  const response = await fetch(`${env.BACKEND_PATH}${endpoint}`, {
     credentials: "include",
-    mode: "cors",
-    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {}),
+      ...options.headers,
     },
-  };
-  console.log(`🔄 API Client: ${config.method || "GET"} ${url}`);
+    ...options,
+  });
 
-  const res = await fetch(url, config);
-  console.log(`📥 Response: ${res.status} ${res.statusText}`);
+  let body: unknown = null;
 
-  const cookieHeader = res.headers.get("set-cookie");
-  if (cookieHeader) {
-    console.log("🍪 Set-Cookie header present in response");
+  try {
+    body = await response.json();
+  } catch {
+    body = null; // empty or non-json response
   }
 
-  const data = await res.json().catch(() => ({
-    message: `HTTP ${res.status}: ${res.statusText}`,
-  }));
+  /**
+   * Case 1: Backend Response Wrapper { success, data, message }
+   */
+  if (body && typeof body === "object" && "success" in body) {
+    const apiResponse = body as ApiResponse<T>;
 
-  if (!res.ok)
-    throw new ApiError(data.message || "Request failed", res.status, data);
+    if (apiResponse.success) {
+      return apiResponse.data as T;
+    }
 
-  return data;
+    throw new ApiError(
+      response.status,
+      apiResponse.message ? [apiResponse.message] : ["Request failed"],
+      []
+    );
+  }
+
+  /**
+   * Case 2: Error response
+   */
+  if (!response.ok) {
+    const errorBody = body as ApiErrorResponse;
+
+    throw new ApiError(
+      response.status,
+      errorBody?.messages || [response.statusText],
+      errorBody?.errors || []
+    );
+  }
+
+  /**
+   * Case 3: Raw/ unwrapped response (fallback)
+   */
+  return body as T;
 }
 
+/* ------------ Exposed API Client ------------ */
 export const apiClient = {
-  get: async <T>(endpoint: string) =>
+  get: <T>(endpoint: string) =>
     apiRequest<T>(endpoint, { method: "GET" }),
 
-  post: async <Req, Res>(endpoint: string, data: Req) =>
-    apiRequest<Res>(endpoint, { method: "POST", body: JSON.stringify(data) }),
+  post: <Req, Res>(endpoint: string, body: Req) =>
+    apiRequest<Res>(endpoint, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 
-  put: async <Req, Res>(endpoint: string, data: Req) =>
-    apiRequest<Res>(endpoint, { method: "PUT", body: JSON.stringify(data) }),
+  put: <Req, Res>(endpoint: string, body: Req) =>
+    apiRequest<Res>(endpoint, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
 
-  delete: async <Res>(endpoint: string) =>
+  patch: <Req, Res>(endpoint: string, body: Req) =>
+    apiRequest<Res>(endpoint, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  delete: <Res>(endpoint: string) =>
     apiRequest<Res>(endpoint, { method: "DELETE" }),
 };

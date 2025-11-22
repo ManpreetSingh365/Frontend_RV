@@ -1,3 +1,5 @@
+// src/lib/env.ts
+
 import { object, pipe, string, url, safeParse } from "valibot";
 
 const envSchema = object({

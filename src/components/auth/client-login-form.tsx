@@ -63,7 +63,7 @@ export function ClientLoginForm({ className }: React.ComponentProps<"div">) {
     try {
       // Call backend (Spring Boot sets HTTP-only cookie)
       await apiClient.post<LoginFormValues, LoginResponse>(
-        "/api/v1/auth/login",
+        "/portal/auth/login",
         parsed.output
       );
 
