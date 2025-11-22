@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
  * ✅ Auth JWT payload interface
  */
 export interface AuthPayload {
-  roles?: string[];
+  roles?: string;
   permissions?: string[];
   sub?: string;
   iat?: number;
@@ -112,10 +112,10 @@ export function checkClientAuth(): boolean {
 /**
  * ✅ Extracts roles from token payload (server or decoded token)
  */
-export function getUserRoles(token: string | null): string[] {
-  if (!token) return [];
+export function getUserRole(token: string | null): string {
+  if (!token) return "";
   const payload = decodeAuthPayload(token);
-  return payload?.roles || [];
+  return payload?.role;
 }
 
 /**

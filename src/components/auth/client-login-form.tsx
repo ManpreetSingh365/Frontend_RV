@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { safeParse } from "valibot";
-import { loginSchema } from "@/lib/valibot/schemas/loginSchema";
+import { loginSchema } from "@/lib/validation/auth.schema";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";

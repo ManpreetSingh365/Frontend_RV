@@ -1,3 +1,4 @@
+// src/lib/validation/auth.schema.ts
 import { object, string, pipe, minLength, maxLength, optional, boolean } from "valibot";
 
 export const loginSchema = object({
