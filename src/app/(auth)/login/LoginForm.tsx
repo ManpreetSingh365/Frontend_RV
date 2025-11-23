@@ -33,7 +33,7 @@ export function LoginForm({
     useEffect(() => {
         if (result?.success) {
             setTimeout(() => {
-                router.push("/admin/panel");
+                router.push("/panel");
             }, 1000);
         }
     }, [result?.success, router]);

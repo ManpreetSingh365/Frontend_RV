@@ -1,5 +1,3 @@
-// http://localhost:3000/admin/panel/users/manpreet
-// http://localhost:3000/user/panel/users/manpreet
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 

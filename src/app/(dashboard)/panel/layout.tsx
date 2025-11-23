@@ -4,23 +4,23 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { cookies } from "next/headers";
 
 
-export default async function RoleLayout({
+export default async function PanelLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ role: string; username: string }>;
+  params: Promise<{ username: string }>;
 }) {
-  const { role, username } = await params;
+  const { username } = await params;
 
-  console.log(`role: ${role}, username: ${username || "not provided"}`);
+  console.log(`username: ${username || "not provided"}`);
 
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar role={role} username={username} />
+      <AppSidebar username={username} />
       <main className="w-full">
         <Navbar />
         <div className="px-4">{children}</div>

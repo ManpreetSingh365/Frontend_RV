@@ -1,4 +1,3 @@
-// app/(dashboard)/admin/panel/page.tsx
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppAreaChart from "@/components/chart/AppAreaChart";
@@ -8,6 +7,7 @@ import CardList from "@/components/CardList";
 import TodoList from "@/components/TodoList";
 import { getAuthToken, decodeAuthPayload } from "@/lib/util/auth-utils";
 import { logger } from "@/lib/service/logger";
+import { logoutAction } from "@/lib/action/auth.actions";
 
 export default async function AdminPanel() {
   // ✅ Securely read the JWT cookie using your centralized utility
@@ -105,7 +105,7 @@ export default async function AdminPanel() {
               </p>
             </div>
 
-            <form action="/api/auth/logout" method="POST">
+            <form action={logoutAction}>
               <button
                 type="submit"
                 className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition-colors"

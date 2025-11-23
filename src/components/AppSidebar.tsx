@@ -25,14 +25,12 @@ import { User2, ChevronUp } from "lucide-react";
 import { getSidebarItems, iconMap } from "@/config/sidebar-items";
 
 export default function AppSidebar({
-  role,
   username = "guest",
 }: {
-  role: string;
   username?: string;
 }) {
   // const items = getSidebarItems(role, username || undefined);
-  const items = getSidebarItems(role, username);
+  const items = getSidebarItems(username);
 
   return (
     <Sidebar collapsible="icon">

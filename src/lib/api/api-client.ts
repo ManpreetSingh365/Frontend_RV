@@ -1,4 +1,5 @@
-// src/lib/api-client.ts
+// src/lib/api/api-client.ts
+import { cookies } from "next/headers";
 import { env } from "../validation/env";
 import { ApiResponse, ApiErrorResponse, ApiError } from "./types";
 
@@ -7,10 +8,16 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
 
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.getAll()
+    .map(cookie => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+
   const response = await fetch(`${env.BACKEND_PATH}${endpoint}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(cookieHeader && { Cookie: cookieHeader }),
       ...options.headers,
     },
     ...options,
@@ -21,12 +28,10 @@ async function apiRequest<T>(
   try {
     body = await response.json();
   } catch {
-    body = null; // empty or non-json response
+    body = null;
   }
 
-  /**
-   * Case 1: Backend Response Wrapper { success, data, message }
-   */
+  // Your existing wrapper logic
   if (body && typeof body === "object" && "success" in body) {
     const apiResponse = body as ApiResponse<T>;
 
@@ -41,9 +46,6 @@ async function apiRequest<T>(
     );
   }
 
-  /**
-   * Case 2: Error response
-   */
   if (!response.ok) {
     const errorBody = body as ApiErrorResponse;
 
@@ -54,11 +56,9 @@ async function apiRequest<T>(
     );
   }
 
-  /**
-   * Case 3: Raw/ unwrapped response (fallback)
-   */
   return body as T;
 }
+
 
 /* ------------ Exposed API Client ------------ */
 export const apiClient = {

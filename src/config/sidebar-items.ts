@@ -28,13 +28,13 @@ export const iconMap = {
 } as const;
 
 // ---------- ROLE-BASED ITEMS ----------
-export const getSidebarItems = (role: string, username?: string) => {
+export const getSidebarItems = (username?: string) => {
   // Common sections for all roles
   const common = [
     {
       title: "MAIN",
       items: [
-        { name: "Dashboard", icon: "dashboard", path: `/${role}/panel/` },
+        { name: "Dashboard", icon: "dashboard", path: `/panel/` },
         { name: "Map", icon: "map", path: "/map" },
       ],
     },
@@ -44,14 +44,14 @@ export const getSidebarItems = (role: string, username?: string) => {
   const fleetManagement = {
     title: "FLEET MANAGEMENT",
     items: [
-      { name: "Users", icon: "user", path: `/${role}/panel/users` },
+      { name: "Users", icon: "user", path: `/panel/users` },
       {
         name: `User: ${username}`,
         icon: "user",
-        path: `/${role}/panel/users/${username}`,
+        path: `/panel/users/${username}`,
       },
-      { name: "Vehicles", icon: "truck", path: `/${role}/panel/vehicle` },
-      { name: "Reports", icon: "chart", path: `/${role}/panel/report` },
+      { name: "Vehicles", icon: "truck", path: `/panel/vehicle` },
+      { name: "Reports", icon: "chart", path: `/panel/report` },
       { name: "Maintenance", icon: "wrench", path: "/maintenance" },
     ],
   };
@@ -74,33 +74,5 @@ export const getSidebarItems = (role: string, username?: string) => {
     ],
   };
 
-  // Role-based visibility
-  switch (role) {
-    case "admin":
-      return [...common, fleetManagement, analytics, system];
-    case "manager":
-      return [...common, fleetManagement, system];
-    case "driver":
-      return [
-        ...common,
-        {
-          title: "MY DASHBOARD",
-          items: [
-            {
-              name: "My Vehicles",
-              icon: "truck",
-              path: `/${role}/panel/vehicle`,
-            },
-            {
-              name: "My Reports",
-              icon: "chart",
-              path: `/${role}/panel/report`,
-            },
-          ],
-        },
-        system,
-      ];
-    default:
-      return [...common, system];
-  }
+  return [...common, fleetManagement, analytics, system];
 };

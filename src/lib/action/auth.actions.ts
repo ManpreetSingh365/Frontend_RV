@@ -78,6 +78,9 @@ export async function loginAction(
 
 export async function logoutAction() {
     await logoutUser();
+
+    // after logout redirect to login page
+    redirect("/login");
 }
 
 export async function refreshTokenAction() {
