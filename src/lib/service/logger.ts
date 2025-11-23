@@ -3,18 +3,39 @@
 type LogLevel = "info" | "warn" | "error" | "debug";
 
 interface LogOptions {
-    source?: string;   // ex: "UserService"
-    data?: unknown;    // optional payload
+    source?: string;   // optional manual override
+    data?: unknown;
 }
 
-function formatMessage(level: LogLevel, message: string, source?: string) {
+// Extract caller file name from stack trace
+function getCallerSource(): string {
+    try {
+        const error = new Error();
+        const stack = error.stack?.split("\n");
+
+        // Adjust index if needed based on runtime
+        const callerLine = stack?.[3] || "";
+
+        const match = callerLine.match(/\/([^\/]+\.ts|\.tsx)/);
+        return match?.[1] || "unknown";
+    } catch {
+        return "unknown";
+    }
+}
+
+function formatMessage(
+    level: LogLevel,
+    message: string,
+    source?: string
+) {
     const timestamp = new Date().toISOString();
     const tag = source ? `[${source}]` : "";
     return `[${timestamp}] [${level.toUpperCase()}] ${tag} ${message}`;
 }
 
 function log(level: LogLevel, message: string, options?: LogOptions) {
-    const logMessage = formatMessage(level, message, options?.source);
+    const source = options?.source || getCallerSource();
+    const logMessage = formatMessage(level, message, source);
 
     if (options?.data) {
         console[level](logMessage, options.data);

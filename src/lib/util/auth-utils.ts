@@ -17,14 +17,13 @@ export interface AuthPayload {
 
 /**
  * Read httpOnly access token from server cookies
-*/
+ */
 export async function getAuthToken(): Promise<string | null> {
   try {
     const cookieStore = await cookies();
     return cookieStore.get("access_token")?.value ?? null;
   } catch (err) {
     logger.error("Failed to read auth cookie", {
-      source: "AuthUtils",
       data: err,
     });
     return null;
@@ -59,7 +58,6 @@ export function decodeAuthPayload(token: string): AuthPayload | null {
     return decoded;
   } catch (err) {
     logger.warn("Failed to decode JWT", {
-      source: "AuthUtils",
       data: err,
     });
     return null;

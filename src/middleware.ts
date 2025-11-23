@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { logger } from "@/lib/service/logger";
 
 export function middleware(req: NextRequest) {
     const tokenCookie = req.cookies.get("access_token");
     const token = tokenCookie?.value;
     const path = req.nextUrl.pathname;
 
-    // ✅ Enhanced logging
-    console.log(`🛡️ Middleware: ${path}`);
-    console.log(
-        `🔐 Auth Token: ${token ? `Present (${token.substring(0, 20)}...)` : "Missing"
-        }`
-    );
+    // ✅ Logging with source tracking
+    logger.debug(`Middleware processing: ${path}`, {
+        data: {
+            path,
+            tokenPresent: !!token
+        }
+    });
 
     // Protected routes that require authentication
     const isProtectedRoute =
@@ -34,7 +36,9 @@ export function middleware(req: NextRequest) {
 
     // ✅ Redirect to login if accessing protected route without token
     if (isProtectedRoute && !token) {
-        console.log("🔒 Redirecting to login - authentication required");
+        logger.warn("Redirecting to login - authentication required", {
+            data: { path }
+        });
         const loginUrl = new URL("/login", req.url);
         // Optional: Add return URL for post-login redirect
         loginUrl.searchParams.set("returnUrl", path);
@@ -43,11 +47,12 @@ export function middleware(req: NextRequest) {
 
     // ✅ Redirect to admin panel if already authenticated and trying to access auth routes
     if (isAuthRoute && token) {
-        console.log("✅ Redirecting to admin panel - user already authenticated");
+        logger.debug("Redirecting to admin panel - user already authenticated", {
+            data: { path }
+        });
         return NextResponse.redirect(new URL("/admin/panel", req.url));
     }
 
-    console.log("✅ Middleware: Request allowed to proceed");
     return NextResponse.next();
 }
 

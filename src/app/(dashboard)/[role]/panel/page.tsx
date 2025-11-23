@@ -14,7 +14,7 @@ export default async function AdminPanel() {
   const token = await getAuthToken();
 
   if (!token) {
-    logger.warn("No valid access_token found - redirecting to /login", { source: "AdminPanel" });
+    logger.warn("No valid access_token found - redirecting to /login");
     redirect("/login");
   }
 
@@ -22,7 +22,7 @@ export default async function AdminPanel() {
   const payload = decodeAuthPayload(token);
 
   if (!payload) {
-    logger.error("Failed to decode JWT payload - redirecting to /login", { source: "AdminPanel" });
+    logger.error("Failed to decode JWT payload - redirecting to /login");
     redirect("/login");
   }
 
