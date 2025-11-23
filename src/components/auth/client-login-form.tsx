@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { safeParse } from "valibot";
 import { loginSchema } from "@/lib/validation/auth.schema";
-import { cn } from "@/lib/utils";
-import { apiClient } from "@/lib/api-client";
+import { cn } from "@/lib/util/utils";
+import { apiClient } from "@/lib/api/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {

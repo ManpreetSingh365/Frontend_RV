@@ -1,6 +1,6 @@
 // src/lib/api-client.ts
-import { env } from "./env";
-import { ApiResponse, ApiErrorResponse, ApiError } from "./api/types";
+import { env } from "../validation/env";
+import { ApiResponse, ApiErrorResponse, ApiError } from "./types";
 
 async function apiRequest<T>(
   endpoint: string,

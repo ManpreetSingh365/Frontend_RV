@@ -6,29 +6,29 @@ import AppBarChart from "@/components/chart/AppBarChart";
 import AppPieChart from "@/components/chart/AppPieChart";
 import CardList from "@/components/CardList";
 import TodoList from "@/components/TodoList";
-import { getAuthToken, decodeAuthPayload } from "@/lib/auth-utils";
+import { getAuthToken, decodeAuthPayload } from "@/lib/util/auth-utils";
+import { logger } from "@/lib/service/logger";
 
 export default async function AdminPanel() {
   // ✅ Securely read the JWT cookie using your centralized utility
   const token = await getAuthToken();
 
   if (!token) {
-    console.warn("⛔ No valid access_token found — redirecting to /login");
+    logger.warn("No valid access_token found - redirecting to /login", { source: "AdminPanel" });
     redirect("/login");
   }
 
-  // ✅ Decode and validate token payload (roles, permissions, expiry, etc.)
+  // ✅ Decode and validate token payload (role, permissions, expiry, etc.)
   const payload = decodeAuthPayload(token);
 
   if (!payload) {
-    console.error("❌ Failed to decode JWT payload — redirecting to /login");
+    logger.error("Failed to decode JWT payload - redirecting to /login", { source: "AdminPanel" });
     redirect("/login");
   }
-  const userId = payload.sub || "N/A";
 
-  const userRoles = payload.roles?.join(", ") || "N/A";
-  const rolesCount = payload.roles?.length || 0;
-
+  const userId = payload.userId || "N/A";
+  const username = payload.sub || "N/A";
+  const userRole = payload.role || "N/A";
   const userPermissions = payload.permissions?.join(", ") || "N/A";
   const permissionsCount = payload.permissions?.length || 0;
 
@@ -67,22 +67,21 @@ export default async function AdminPanel() {
               </p>
             </div>
 
-            {/* ✅ Payload Details */}
             <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
               <h3 className="font-semibold text-gray-800 mb-2">
                 Decoded Token Details:
               </h3>
 
               <p className="text-sm text-gray-700">
-                <strong>UserId:</strong>
-                {userId}
+                <strong>User ID:</strong> {userId}
               </p>
 
               <p className="text-sm text-gray-700">
-                <strong>
-                  Roles<sub>{rolesCount}</sub> :
-                </strong>{" "}
-                {userRoles}
+                <strong>Username:</strong> {username}
+              </p>
+
+              <p className="text-sm text-gray-700">
+                <strong>Role:</strong> {userRole}
               </p>
 
               <p className="text-sm text-gray-700">

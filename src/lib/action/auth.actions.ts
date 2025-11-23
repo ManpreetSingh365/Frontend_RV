@@ -1,34 +1,47 @@
 // src/lib/action/auth.actions.ts
-"use server";
+'use client';
 
-import {
-    loginUser,
-    logoutUser,
-    refreshToken,
-} from "../service/auth.service";
-
+import { loginUser, logoutUser, refreshToken } from "../service/auth.service";
 import { loginSchema } from "@/lib/validation/auth.schema";
 import { safeParse } from "valibot";
-import { LoginResult } from "../type/LoginResult";
 import { redirect } from "next/navigation";
 
-export async function loginAction(
-    prevState: LoginResult | null,
-    formData: FormData
-): Promise<LoginResult | null> {
+type AlertVariant = "error" | "success" | "warning" | "info";
 
+export interface LoginFormState {
+    success?: boolean;
+    message?: string;
+    variant?: AlertVariant;
+    fieldErrors?: Record<string, string[]>;
+}
+
+/**
+ * Client-side login action - handles business logic
+ * This runs in the BROWSER, not on the server
+ * Compatible with React's useActionState hook
+ * 
+ * @param prevState - Previous form state (from useActionState)
+ * @param formData - FormData from the form submission
+ * @returns Promise<LoginFormState> - New state with success/error
+ */
+export async function loginAction(
+    prevState: LoginFormState | null,
+    formData: FormData
+): Promise<LoginFormState> {
+    // Step 1: Extract and prepare data
     const payload = {
-        username: formData.get("username"),
-        password: formData.get("password"),
+        username: formData.get("username") as string,
+        password: formData.get("password") as string,
         rememberMe: formData.get("rememberMe") === "on",
     };
 
-    const validated = safeParse(loginSchema, payload);
+    // Step 2: Validate input with valibot schema
+    const validatedPayload = safeParse(loginSchema, payload);
 
-    if (!validated.success) {
+    if (!validatedPayload.success) {
         const fieldErrors: Record<string, string[]> = {};
 
-        validated.issues.forEach(issue => {
+        validatedPayload.issues.forEach(issue => {
             const key = issue.path?.[0];
             if (key) {
                 const keyStr = String(key);
@@ -39,30 +52,29 @@ export async function loginAction(
 
         return {
             success: false,
+            variant: "error",
             fieldErrors,
-            message: "Validation failed",
+            message: "Please fix the errors below",
         };
     }
 
+    // Step 3: Call API (runs in browser, cookies will be stored)
     try {
-        const response = await loginUser(validated.output);
+        const response = await loginUser(validatedPayload.output);
 
         return {
             success: true,
-            message: "Login successful",
+            variant: "success",
+            message: response.message || "Login Successful !",
         };
-
-        // REDIRECT AFTER LOGIN
-        // redirect("/admin/panel");
     } catch (error: any) {
         return {
             success: false,
-            message: error.message || "Login failed",
+            variant: "error",
+            message: error.messages?.[0] || error.message || "Login failed. Please try again.",
         };
     }
 }
-
-
 
 export async function logoutAction() {
     await logoutUser();

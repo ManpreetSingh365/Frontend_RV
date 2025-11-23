@@ -1,6 +1,6 @@
 // src/app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "@/lib/env";
+import { env } from "@/lib/validation/env";
 
 export const runtime = "edge"; // ✅ Edge function for faster responses
 
