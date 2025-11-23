@@ -28,10 +28,12 @@ async function apiRequest<T>(
   try {
     body = await response.json();
   } catch {
-    body = null;
+    body = null; // empty or non-json response
   }
 
-  // Your existing wrapper logic
+  /**
+   * Case 1: Backend Response Wrapper { success, data, message }
+   */
   if (body && typeof body === "object" && "success" in body) {
     const apiResponse = body as ApiResponse<T>;
 
@@ -46,6 +48,9 @@ async function apiRequest<T>(
     );
   }
 
+  /**
+   * Case 2: Error response
+   */
   if (!response.ok) {
     const errorBody = body as ApiErrorResponse;
 
@@ -56,6 +61,9 @@ async function apiRequest<T>(
     );
   }
 
+  /**
+   * Case 3: Raw/ unwrapped response (fallback)
+   */
   return body as T;
 }
 
