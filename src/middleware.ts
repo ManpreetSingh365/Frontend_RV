@@ -50,7 +50,7 @@ export function middleware(req: NextRequest) {
         logger.debug("Redirecting to admin panel - user already authenticated", {
             data: { path }
         });
-        return NextResponse.redirect(new URL("/admin/panel", req.url));
+        return NextResponse.redirect(new URL("/panel", req.url));
     }
 
     return NextResponse.next();

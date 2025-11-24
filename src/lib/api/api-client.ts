@@ -1,5 +1,4 @@
 // src/lib/api/api-client.ts
-import { cookies } from "next/headers";
 import { env } from "../validation/env";
 import { ApiResponse, ApiErrorResponse, ApiError } from "./types";
 
@@ -8,16 +7,10 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
 
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.getAll()
-    .map(cookie => `${cookie.name}=${cookie.value}`)
-    .join("; ");
-
   const response = await fetch(`${env.BACKEND_PATH}${endpoint}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(cookieHeader && { Cookie: cookieHeader }),
       ...options.headers,
     },
     ...options,
