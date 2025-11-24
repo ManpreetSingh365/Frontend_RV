@@ -69,7 +69,7 @@ export default function UsersList({
 
     return (
         <div className="min-h-screen p-8">
-            <PageHeader />
+            <PageHeader onUserCreated={refetch} />
             <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
             <UserTable users={users} onUserDeleted={refetch} />
             <Pagination
