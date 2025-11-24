@@ -2,10 +2,17 @@
 import { env } from "../validation/env";
 import { ApiResponse, ApiErrorResponse, ApiError } from "./types";
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+
+  // Simulate backend delay
+  // await sleep(5000);
 
   const response = await fetch(`${env.BACKEND_PATH}${endpoint}`, {
     credentials: "include",

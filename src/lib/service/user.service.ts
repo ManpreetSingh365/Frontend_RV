@@ -8,11 +8,30 @@ export type User = {
     lastName: string;
     email: string;
     phoneNumber: string;
-    roleId: string;
+    role: string;
     active: boolean;
+    lastLogin: string | null;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    modifiedBy: string;
+    vehiclesIds: string[];
+    addresses: Array<{
+        streetLine1: string;
+        streetLine2: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        country: string;
+        landmark: string;
+        addressType: string;
+        primaryAddress: boolean;
+    }>;
 };
 
+
 /* ================= USER CRUD ================= */
+// Current, only use getUsers, deleteUser, hardDeleteUser from user.service.ts not from user.actions.ts
 
 // CREATE USER
 export const createUser = (payload: Partial<User>) =>
@@ -60,3 +79,7 @@ export const updateUser = (
 // SOFT DELETE USER
 export const deleteUser = (userId: string) =>
     apiClient.delete<void>(`/users/${userId}`);
+
+// HARD DELETE USER
+export const hardDeleteUser = (userId: string) =>
+    apiClient.delete<void>(`/users/hard/${userId}`);

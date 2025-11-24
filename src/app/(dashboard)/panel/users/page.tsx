@@ -1,19 +1,21 @@
 import UsersList from "./UsersList";
 
-export default function UsersPage({
+export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     size?: string;
     search?: string;
-  };
+  }>;
 }) {
+  // Await searchParams in Next.js 15+
+  const params = await searchParams;
+
   return (
     <UsersList
-      initialPage={Number(searchParams.page) || 1}
-      initialSize={Number(searchParams.size) || 10}
-      initialSearch={searchParams.search || ""}
+      initialPage={Number(params.page) || 1}
+      initialSearch={params.search || ""}
     />
   );
 }

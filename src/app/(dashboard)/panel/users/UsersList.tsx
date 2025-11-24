@@ -1,73 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getUsers, User } from "@/lib/service/user.service";
+import { useState } from "react";
+import { useUsers } from "./hooks/use-users";
+import PageHeader from "./components/PageHeader";
+import FilterBar from "./components/FilterBar";
+import UserTable from "./components/UserTable";
+import Pagination from "./components/Pagination";
+import { LoadingState } from "@/components/ui/loading-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function UsersList({
     initialPage = 1,
-    initialSize = 10,
     initialSearch = "",
 }: {
     initialPage?: number;
-    initialSize?: number;
     initialSearch?: string;
 }) {
-    const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [searchTerm, setSearchTerm] = useState(initialSearch);
 
-    useEffect(() => {
-        async function fetchUsers() {
-            try {
-                setLoading(true);
-                setError(null);
+    const { users, loading, error, refetch } = useUsers({
+        page: currentPage,
+        search: searchTerm,
+    });
 
-                const data = await getUsers({
-                    page: initialPage,
-                    size: initialSize,
-                    search: initialSearch,
-                    sortBy: "createdAt",
-                    sortOrder: "DESC",
-                    viewMode: "hierarchy",
-                });
-
-                setUsers(data);
-            } catch (err) {
-                console.error("Error fetching users:", err);
-                setError(err instanceof Error ? err.message : "Failed to fetch users");
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchUsers();
-    }, [initialPage, initialSize, initialSearch]);
+    const handleSearchChange = (search: string) => {
+        setSearchTerm(search);
+        setCurrentPage(1);
+    };
 
     if (loading) {
         return (
-            <div>
-                <h1>Users</h1>
-                <p>Loading users...</p>
+            <div className="min-h-screen p-8">
+                <PageHeader />
+                <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                <LoadingState rows={5} />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div>
-                <h1>Users</h1>
-                <div style={{ color: "red" }}>
-                    <p>Error loading users</p>
-                    <div>{error}</div>
-                </div>
+            <div className="min-h-screen p-8">
+                <PageHeader />
+                <ErrorState
+                    title="Failed to load users"
+                    message={error}
+                    onRetry={refetch}
+                />
+            </div>
+        );
+    }
+
+    if (users.length === 0) {
+        return (
+            <div className="min-h-screen p-8">
+                <PageHeader />
+                <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                <EmptyState
+                    icon="search"
+                    title="No users found"
+                    message={searchTerm ? `No results for "${searchTerm}"` : "No users have been added yet"}
+                />
             </div>
         );
     }
 
     return (
-        <div>
-            <h1>Users</h1>
-            <pre>{JSON.stringify(users, null, 2)}</pre>
+        <div className="min-h-screen p-8">
+            <PageHeader />
+            <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+            <UserTable users={users} onUserDeleted={refetch} />
+            <Pagination
+                currentPage={currentPage}
+                totalPages={1}
+                totalItems={users.length}
+                itemsPerPage={10}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 }

@@ -1,5 +1,4 @@
 "use server";
-
 import { revalidatePath } from "next/cache";
 import {
     createUser,
@@ -41,8 +40,17 @@ export async function updateUserAction(userId: string, formData: FormData) {
     revalidatePath(`/users/${userId}`);
 }
 
-// DELETE
-export async function deleteUserAction(userId: string) {
+// DELETE - Client action (runs in browser, cookies included automatically)
+export async function deleteUserAction(userId: string): Promise<void> {
     await deleteUser(userId);
     revalidatePath("/users");
 }
+
+
+// "use client";
+
+// import { deleteUser } from "../service/user.service";
+
+// export async function deleteUserAction(userId: string): Promise<void> {
+//   await deleteUser(userId);
+// }
