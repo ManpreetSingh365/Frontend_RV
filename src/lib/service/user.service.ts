@@ -18,14 +18,14 @@ export type User = {
     vehiclesIds: string[];
     addresses: Array<{
         streetLine1: string;
-        streetLine2: string;
+        streetLine2?: string;
         city: string;
         state: string;
         postalCode: string;
         country: string;
-        landmark: string;
+        landmark?: string;
         addressType: string;
-        primaryAddress: boolean;
+        primaryAddress?: boolean;
     }>;
 };
 

@@ -16,7 +16,7 @@ export function useRoles(): UseRolesReturn {
         const fetchRoles = async () => {
             try {
                 setLoading(true);
-                const data = await getRoles({ viewMode: "hierarchy" });
+                const data = await getRoles({ viewMode: "hierarchy" }); // createdBy, hierarchy, both
                 setRoles(data);
                 setError(null);
             } catch (err) {
