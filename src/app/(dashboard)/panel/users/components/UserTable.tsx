@@ -127,9 +127,13 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={user.active ? "default" : "secondary"}>
+                                        <span
+                                            className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-semibold ${user.active
+                                                ? "bg-green-500/15 text-green-500 border border-green-500/40"
+                                                : "bg-red-500/15 text-red-500 border border-red-500/40"}`}
+                                        >
                                             {user.active ? "Active" : "Inactive"}
-                                        </Badge>
+                                        </span>
                                     </TableCell>
                                     <TableCell className="font-mono text-sm text-primary">
                                         {user.username}

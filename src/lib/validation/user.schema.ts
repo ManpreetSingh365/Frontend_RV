@@ -1,5 +1,4 @@
 // src/lib/validation/user.schema.ts
-// src/lib/validation/user.schema.ts
 import {
     object,
     string,
@@ -13,7 +12,6 @@ import {
     optional,
     boolean,
     minValue,
-    picklist
 } from "valibot";
 
 /**
@@ -43,10 +41,11 @@ const addressSchema = object({
         minLength(1, "State is required")
     ),
 
-    postalCode: pipe(
-        string(),
-        minLength(1, "Postal code is required"),
-        regex(/^\d{6}$/, "Postal code must be 6 digits") // Keep if India-only
+    postalCode: optional(
+        pipe(
+            string(),
+            regex(/^\d{6}$/, "Postal code must be 6 digits")
+        )
     ),
 
     country: pipe(
@@ -72,10 +71,12 @@ export const createUserSchema = object({
         regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores")
     ),
 
-    email: pipe(
-        string(),
-        maxLength(100, "Email must not exceed 100 characters"),
-        email("Please enter a valid email address")
+    email: optional(
+        pipe(
+            string(),
+            maxLength(100, "Email must not exceed 100 characters"),
+            email("Please enter a valid email address")
+        )
     ),
 
     firstName: pipe(
@@ -108,9 +109,11 @@ export const createUserSchema = object({
         )
     ),
 
-    roleId: pipe(
-        string(),
-        regex(uuidRegex, "Role ID must be a valid UUID")
+    roleId: optional(
+        pipe(
+            string(),
+            regex(uuidRegex, "Role ID must be a valid UUID")
+        )
     ),
 
     vehicleIds: optional(
@@ -122,9 +125,8 @@ export const createUserSchema = object({
         )
     ),
 
-    addresses: pipe(
-        array(addressSchema),
-        minLength(1, "At least one address is required")
+    addresses: optional(
+        array(addressSchema)
     )
 });
 
@@ -133,20 +135,20 @@ export const createUserSchema = object({
  */
 export type CreateUserInput = {
     username: string;
-    email: string;
+    email?: string;
     firstName: string;
     lastName: string;
     password: string;
     phoneNumber: string;
     vehicleCreditLimit?: number;
-    roleId: string;
+    roleId?: string;
     vehicleIds?: string[];
-    addresses: {
+    addresses?: {
         streetLine1: string;
         streetLine2?: string;
         city: string;
         state: string;
-        postalCode: string;
+        postalCode?: string;
         country: string;
         landmark?: string;
         addressType: string;

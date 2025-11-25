@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api/api-client";
+import type { CreateUserInput } from "@/lib/validation/user.schema";
 
 // Adjust based on your backend User DTO
 export type User = {
@@ -34,8 +35,8 @@ export type User = {
 // Current, only use getUsers, deleteUser, hardDeleteUser from user.service.ts not from user.actions.ts
 
 // CREATE USER
-export const createUser = (payload: Partial<User>) =>
-    apiClient.post<Partial<User>, User>("/users", payload);
+export const createUser = (payload: CreateUserInput) =>
+    apiClient.post<CreateUserInput, User>("/users", payload);
 
 // GET ALL USERS (with optional pagination)
 export const getUsers = (params?: {

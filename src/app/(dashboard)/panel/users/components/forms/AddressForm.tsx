@@ -91,9 +91,7 @@ export function AddressForm({
                     name="addresses.0.postalCode"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Postal Code <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <FormLabel>Postal Code</FormLabel>
                             <FormControl>
                                 <Input placeholder="143001" {...field} />
                             </FormControl>

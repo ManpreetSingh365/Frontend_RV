@@ -2,6 +2,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { SearchableCombobox, type ComboboxOption } from "@/components/ui/searchable-combobox";
+import { RequiredLabel, FieldRow, NumberInput, MultiSelectField } from "@/components/ui/form/index";
 import type { CreateUserInput } from "@/lib/validation/user.schema";
 
 interface UserDetailsFormProps {
@@ -25,16 +26,13 @@ export function UserDetailsForm({
                 <h3 className="text-lg font-semibold">User Details</h3>
             </div>
 
-            {/* Username & Email */}
-            <div className="grid grid-cols-2 gap-4">
+            <FieldRow>
                 <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Username <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <RequiredLabel>Username</RequiredLabel>
                             <FormControl>
                                 <Input placeholder="johndoe" {...field} />
                             </FormControl>
@@ -47,9 +45,7 @@ export function UserDetailsForm({
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Email <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <FormLabel>Email</FormLabel>
                             <FormControl>
                                 <Input type="email" placeholder="john@example.com" {...field} />
                             </FormControl>
@@ -57,18 +53,15 @@ export function UserDetailsForm({
                         </FormItem>
                     )}
                 />
-            </div>
+            </FieldRow>
 
-            {/* First Name & Last Name */}
-            <div className="grid grid-cols-2 gap-4">
+            <FieldRow>
                 <FormField
                     control={form.control}
                     name="firstName"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                First Name <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <RequiredLabel>First Name</RequiredLabel>
                             <FormControl>
                                 <Input placeholder="John" {...field} />
                             </FormControl>
@@ -81,9 +74,7 @@ export function UserDetailsForm({
                     name="lastName"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Last Name <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <RequiredLabel>Last Name</RequiredLabel>
                             <FormControl>
                                 <Input placeholder="Doe" {...field} />
                             </FormControl>
@@ -91,18 +82,15 @@ export function UserDetailsForm({
                         </FormItem>
                     )}
                 />
-            </div>
+            </FieldRow>
 
-            {/* Password & Phone Number */}
-            <div className="grid grid-cols-2 gap-4">
+            <FieldRow>
                 <FormField
                     control={form.control}
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Password <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <RequiredLabel>Password</RequiredLabel>
                             <FormControl>
                                 <Input type="password" placeholder="Min. 6 characters" {...field} />
                             </FormControl>
@@ -115,9 +103,7 @@ export function UserDetailsForm({
                     name="phoneNumber"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Phone Number <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <RequiredLabel>Phone Number</RequiredLabel>
                             <FormControl>
                                 <Input placeholder="+919876543210" {...field} />
                             </FormControl>
@@ -125,21 +111,18 @@ export function UserDetailsForm({
                         </FormItem>
                     )}
                 />
-            </div>
+            </FieldRow>
 
-            {/* Role & Vehicle */}
-            <div className="grid grid-cols-2 gap-4">
+            <FieldRow>
                 <FormField
                     control={form.control}
                     name="roleId"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Role <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <FormLabel>Role</FormLabel>
                             <FormControl>
                                 <SearchableCombobox
-                                    value={field.value}
+                                    value={field.value || ""}
                                     onChange={field.onChange}
                                     options={roleOptions}
                                     loading={loadingRoles}
@@ -154,17 +137,17 @@ export function UserDetailsForm({
                 />
                 <FormField
                     control={form.control}
-                    name="vehicleIds.0"
+                    name="vehicleIds"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Assign Vehicle</FormLabel>
+                            <FormLabel>Assign Vehicles</FormLabel>
                             <FormControl>
-                                <SearchableCombobox
-                                    value={field.value || ""}
+                                <MultiSelectField
+                                    value={field.value || []}
                                     onChange={field.onChange}
                                     options={vehicleOptions}
                                     loading={loadingVehicles}
-                                    placeholder="Select vehicle"
+                                    placeholder="Select vehicles..."
                                     searchPlaceholder="Search vehicles..."
                                     emptyMessage="No vehicles found"
                                 />
@@ -174,23 +157,26 @@ export function UserDetailsForm({
                     )}
                 />
 
-                {/* vehicleCreditLimit */}
                 <FormField
                     control={form.control}
                     name="vehicleCreditLimit"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Vehicle Credit Limit <span className="text-red-500">*</span>
-                            </FormLabel>
+                            <FormLabel>Vehicle Credit Limit</FormLabel>
                             <FormControl>
-                                <Input type="number" placeholder="0" {...field} />
+                                <NumberInput
+                                    placeholder="0"
+                                    min={0}
+                                    step={1}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-            </div>
+            </FieldRow>
         </div>
     );
 }
