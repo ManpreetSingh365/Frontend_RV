@@ -59,7 +59,8 @@ export function SearchableCombobox({
                     role="combobox"
                     aria-expanded={open}
                     className={cn(
-                        "w-full justify-between text-white data-[placeholder]:text-gray-400",
+                        "w-full justify-between",
+                        !selectedOption && "text-muted-foreground",
                         className
                     )}
                     disabled={disabled || loading}

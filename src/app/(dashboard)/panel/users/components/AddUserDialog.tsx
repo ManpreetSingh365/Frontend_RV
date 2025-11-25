@@ -85,7 +85,7 @@ export default function AddUserDialog({ onUserCreated, children }: AddUserDialog
                 )}
             </DialogTrigger>
 
-            <DialogContent className="w-[50vw] max-w-none !max-w-[1200px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] w-full overflow-y-auto !max-w-[1200px] sm:w-[95vw] md:w-[80vw] lg:w-[60vw] xl:w-[50vw]">
                 <DialogHeader>
                     <DialogTitle>Add New User</DialogTitle>
                     <DialogDescription>

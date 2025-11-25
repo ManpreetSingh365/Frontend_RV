@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/api-client";
-import type { CreateUserInput } from "@/lib/validation/user.schema";
+import type { CreateUserInput, UpdateUserInput } from "@/lib/validation/user.schema";
 
 // Adjust based on your backend User DTO
 export type User = {
@@ -70,9 +70,9 @@ export const getUserById = (userId: string) =>
 // UPDATE USER
 export const updateUser = (
     userId: string,
-    payload: Partial<User>
+    payload: UpdateUserInput
 ) =>
-    apiClient.put<Partial<User>, User>(
+    apiClient.put<UpdateUserInput, User>(
         `/users/${userId}`,
         payload
     );

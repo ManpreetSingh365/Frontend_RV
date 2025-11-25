@@ -41,12 +41,7 @@ const addressSchema = object({
         minLength(1, "State is required")
     ),
 
-    postalCode: optional(
-        pipe(
-            string(),
-            regex(/^\d{6}$/, "Postal code must be 6 digits")
-        )
-    ),
+    postalCode: optional(string()),
 
     country: pipe(
         string(),
@@ -130,9 +125,6 @@ export const createUserSchema = object({
     )
 });
 
-/**
- * Strict Type
- */
 export type CreateUserInput = {
     username: string;
     email?: string;
@@ -141,6 +133,77 @@ export type CreateUserInput = {
     password: string;
     phoneNumber: string;
     vehicleCreditLimit?: number;
+    roleId?: string;
+    vehicleIds?: string[];
+    addresses?: {
+        streetLine1: string;
+        streetLine2?: string;
+        city: string;
+        state: string;
+        postalCode?: string;
+        country: string;
+        landmark?: string;
+        addressType: string;
+        primaryAddress?: boolean;
+    }[];
+};
+
+/**
+ * User Update schema (excludes username and password)
+ */
+export const updateUserSchema = object({
+    email: optional(
+        pipe(
+            string(),
+            maxLength(100, "Email must not exceed 100 characters"),
+            email("Please enter a valid email address")
+        )
+    ),
+
+    firstName: pipe(
+        string(),
+        minLength(1, "First name is required"),
+        maxLength(100, "First name must not exceed 100 characters")
+    ),
+
+    lastName: pipe(
+        string(),
+        minLength(1, "Last name is required"),
+        maxLength(100, "Last name must not exceed 100 characters")
+    ),
+
+    phoneNumber: pipe(
+        string(),
+        maxLength(15, "Phone number must not exceed 15 characters"),
+        regex(/^\+?[1-9]\d{9,14}$/, "Please enter a valid phone number (e.g., +919876543210)")
+    ),
+
+    roleId: optional(
+        pipe(
+            string(),
+            regex(uuidRegex, "Role ID must be a valid UUID")
+        )
+    ),
+
+    vehicleIds: optional(
+        array(
+            pipe(
+                string(),
+                regex(uuidRegex, "Vehicle ID must be a valid UUID")
+            )
+        )
+    ),
+
+    addresses: optional(
+        array(addressSchema)
+    )
+});
+
+export type UpdateUserInput = {
+    email?: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
     roleId?: string;
     vehicleIds?: string[];
     addresses?: {

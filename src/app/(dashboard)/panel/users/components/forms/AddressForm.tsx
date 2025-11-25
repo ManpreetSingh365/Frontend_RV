@@ -1,12 +1,12 @@
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, FieldPath } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { SearchableCombobox, type ComboboxOption } from "@/components/ui/searchable-combobox";
-import type { CreateUserInput } from "@/lib/validation/user.schema";
+import type { CreateUserInput, UpdateUserInput } from "@/lib/validation/user.schema";
 
 interface AddressFormProps {
-    form: UseFormReturn<CreateUserInput>;
+    form: UseFormReturn<CreateUserInput> | UseFormReturn<UpdateUserInput>;
     addressTypeOptions: ComboboxOption[];
     loadingAddressTypes: boolean;
 }
@@ -23,9 +23,9 @@ export function AddressForm({
             </div>
 
             {/* Street Lines */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.streetLine1"
                     render={({ field }) => (
                         <FormItem>
@@ -40,7 +40,7 @@ export function AddressForm({
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.streetLine2"
                     render={({ field }) => (
                         <FormItem>
@@ -55,9 +55,9 @@ export function AddressForm({
             </div>
 
             {/* City, State, Postal Code */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.city"
                     render={({ field }) => (
                         <FormItem>
@@ -72,7 +72,7 @@ export function AddressForm({
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.state"
                     render={({ field }) => (
                         <FormItem>
@@ -87,7 +87,7 @@ export function AddressForm({
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.postalCode"
                     render={({ field }) => (
                         <FormItem>
@@ -102,9 +102,9 @@ export function AddressForm({
             </div>
 
             {/* Country & Landmark */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.country"
                     render={({ field }) => (
                         <FormItem>
@@ -119,7 +119,7 @@ export function AddressForm({
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.landmark"
                     render={({ field }) => (
                         <FormItem>
@@ -133,10 +133,10 @@ export function AddressForm({
                 />
             </div>
 
-            {/* Address Type & Primary Address */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Address Type &Primary Address */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.addressType"
                     render={({ field }) => (
                         <FormItem>
@@ -159,7 +159,7 @@ export function AddressForm({
                     )}
                 />
                 <FormField
-                    control={form.control}
+                    control={form.control as any}
                     name="addresses.0.primaryAddress"
                     render={({ field }) => (
                         <FormItem className="flex items-center space-x-2 pt-8">
