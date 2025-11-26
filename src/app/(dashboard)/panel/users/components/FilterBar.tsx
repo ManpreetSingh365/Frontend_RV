@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
     Select,
@@ -9,6 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { DebouncedInput } from "@/components/ui/debounced-input";
 import { Search } from "lucide-react";
 
 interface FilterBarProps {
@@ -20,12 +20,14 @@ export default function FilterBar({ searchTerm, onSearchChange }: FilterBarProps
     return (
         <div className="flex gap-4 mb-6">
             <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <DebouncedInput
                     type="text"
                     placeholder="Search by name, username, or mobile..."
                     value={searchTerm}
-                    onChange={(e) => onSearchChange(e.target.value)}
+                    onChange={onSearchChange}
+                    debounceMs={300}
+                    showClearButton
                     className="pl-10"
                 />
             </div>

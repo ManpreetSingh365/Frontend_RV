@@ -60,7 +60,7 @@ export const getUsers = (params?: {
         ? `?${new URLSearchParams(queryParams).toString()}`
         : "";
 
-    return apiClient.get<User[]>(`/users${query}`);
+    return apiClient.getPaginated<User>(`/users${query}`);
 };
 
 // GET USER BY ID

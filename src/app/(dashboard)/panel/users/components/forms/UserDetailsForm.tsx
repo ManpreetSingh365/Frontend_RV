@@ -2,7 +2,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { SearchableCombobox, type ComboboxOption } from "@/components/ui/searchable-combobox";
-import { RequiredLabel, FieldRow, NumberInput, MultiSelectField } from "@/components/ui/form/index";
+import { RequiredLabel, FieldRow, NumberInput, MultiSelectField, PasswordInput } from "@/components/ui/form/index";
 import type { CreateUserInput } from "@/lib/validation/user.schema";
 
 interface UserDetailsFormProps {
@@ -92,7 +92,7 @@ export function UserDetailsForm({
                         <FormItem>
                             <RequiredLabel>Password</RequiredLabel>
                             <FormControl>
-                                <Input type="password" placeholder="Min. 6 characters" {...field} />
+                                <PasswordInput placeholder="Min. 6 characters" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

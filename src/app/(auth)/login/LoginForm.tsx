@@ -139,7 +139,7 @@ export function LoginForm({
                             src="/login-image.png"
                             alt="Login Illustration"
                             fill
-                            className="object-cover dark:brightness-[0.2] dark:grayscale"
+                            className="object-cover dark:brightness-[0.8]"
                             priority
                         />
                     </div>

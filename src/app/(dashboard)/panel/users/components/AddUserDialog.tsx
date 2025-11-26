@@ -19,6 +19,7 @@ import { UserDetailsForm } from "./forms/UserDetailsForm";
 import { AddressForm } from "./forms/AddressForm";
 import { transformRolesToOptions, transformVehiclesToOptions, transformAddressTypesToOptions } from "../utils/form-utils";
 import { INITIAL_USER_FORM_VALUES } from "../constants/form-defaults";
+import { createUserAction } from "@/lib/action/user.actions";
 
 interface AddUserDialogProps {
     onUserCreated?: () => void;
@@ -53,6 +54,8 @@ export default function AddUserDialog({ onUserCreated, children }: AddUserDialog
         startTransition(async () => {
             try {
                 await createUser(data);
+                // await createUserAction(data);
+
                 toast.success("User created successfully!");
                 setOpen(false);
                 form.reset();

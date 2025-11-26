@@ -1,58 +1,66 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getUsers, User } from "@/lib/service/user.service";
+import { PaginationMeta } from "@/lib/api/types";
 
 interface UseUsersParams {
     page: number;
+    size: number;
     search: string;
 }
 
 interface UseUsersReturn {
     users: User[];
+    meta: PaginationMeta | null;
     loading: boolean;
     error: string | null;
     refetch: () => void;
 }
 
-const ITEMS_PER_PAGE = 10;
-
-export function useUsers({ page, search }: UseUsersParams): UseUsersReturn {
+export function useUsers({ page, size, search }: UseUsersParams): UseUsersReturn {
     const [state, setState] = useState<{
         users: User[];
+        meta: PaginationMeta | null;
         loading: boolean;
         error: string | null;
     }>({
         users: [],
+        meta: null,
         loading: true,
         error: null,
     });
 
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         setState((prev) => ({ ...prev, loading: true, error: null }));
 
         try {
-            const users = await getUsers({
+            const response = await getUsers({
                 page,
-                size: ITEMS_PER_PAGE,
+                size,
                 search,
                 sortBy: "createdAt",
                 sortOrder: "DESC",
                 viewMode: "hierarchy",
             });
 
-            setState({ users, loading: false, error: null });
+            setState({
+                users: response.data,
+                meta: response.meta,
+                loading: false,
+                error: null,
+            });
         } catch (err) {
             setState({
                 users: [],
+                meta: null,
                 loading: false,
                 error: err instanceof Error ? err.message : "Failed to fetch users",
             });
         }
-    };
+    }, [page, size, search]);
 
     useEffect(() => {
         fetchUsers();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, search]);
+    }, [fetchUsers]);
 
     return {
         ...state,

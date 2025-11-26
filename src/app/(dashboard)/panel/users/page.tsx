@@ -16,6 +16,7 @@ export default async function UsersPage({
     <UsersList
       initialPage={Number(params.page) || 1}
       initialSearch={params.search || ""}
+      initialPageSize={Number(params.size) || 10}
     />
   );
 }

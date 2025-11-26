@@ -8,6 +8,21 @@ export interface ApiResponse<T> {
     meta: any | null;
 }
 
+export interface PaginationMeta {
+    totalElements: number;
+    totalPages: number;
+    currentPageNo: number;
+    firstPage: boolean;
+    lastPage: boolean;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta: PaginationMeta;
+}
+
 export interface ApiErrorResponse {
     success?: boolean;
     code?: string;
