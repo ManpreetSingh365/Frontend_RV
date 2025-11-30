@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -26,7 +26,7 @@ interface AddUserDialogProps {
 
 export default function AddUserDialog({ onUserCreated, children }: AddUserDialogProps) {
     const [open, setOpen] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const [isPending, setIsPending] = useState(false);
     const [globalError, setGlobalError] = useState("");
 
     // Use centralized data from context - NO redundant API calls!
@@ -46,22 +46,21 @@ export default function AddUserDialog({ onUserCreated, children }: AddUserDialog
     // Form submission handler
     const handleSubmit = async (data: CreateUserInput) => {
         setGlobalError("");
+        setIsPending(true);
 
-        startTransition(async () => {
-            try {
-                await createUser(data);
-                // await createUserAction(data);
-
-                toast.success("User created successfully!");
-                setOpen(false);
-                form.reset();
-                onUserCreated?.();
-            } catch (error: any) {
-                const errorMessage = error.messages?.[0] || error.message || "Failed to create user";
-                setGlobalError(errorMessage);
-                toast.error(errorMessage);
-            }
-        });
+        try {
+            const response = await createUser(data);
+            toast.success(response.message);
+            setOpen(false);
+            form.reset();
+            onUserCreated?.();
+        } catch (error: any) {
+            const errorMessage = error.messages?.[0] || error.message || "Failed to create user";
+            setGlobalError(errorMessage);
+            toast.error(errorMessage);
+        } finally {
+            setIsPending(false);
+        }
     };
 
     // Dialog open/close handler

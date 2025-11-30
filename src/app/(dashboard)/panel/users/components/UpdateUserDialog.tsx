@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -25,7 +25,7 @@ interface UpdateUserDialogProps {
 }
 
 export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpdated }: UpdateUserDialogProps) {
-    const [isPending, startTransition] = useTransition();
+    const [isPending, setIsPending] = useState(false);
     const [globalError, setGlobalError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
@@ -64,25 +64,26 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
     // Fetch user data and prefill form
     useEffect(() => {
         if (open && userId) {
-            setIsLoading(true);
-            setGlobalError("");
+            const fetchUserData = async () => {
+                setIsLoading(true);
+                setGlobalError("");
 
-            startTransition(async () => {
                 try {
-                    const userData = await getUserById(userId);
+                    const response = await getUserById(userId);
+                    const userData = response.data;
 
                     // Find role ID from role name
-                    const userRoleId = roles.find(r => r.name === userData.role)?.id || "";
+                    const userRoleId = roles.find(r => r.name === userData?.role)?.id || "";
 
                     // Prefill form with existing data
                     form.reset({
-                        email: userData.email || "",
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        phoneNumber: userData.phoneNumber,
+                        email: userData?.email || "",
+                        firstName: userData?.firstName || "",
+                        lastName: userData?.lastName || "",
+                        phoneNumber: userData?.phoneNumber || "",
                         roleId: userRoleId,
-                        vehicleIds: userData.vehiclesIds || [],
-                        addresses: userData.addresses?.length > 0 ? userData.addresses : [{
+                        vehicleIds: userData?.vehiclesIds || [],
+                        addresses: userData?.addresses?.length ? userData.addresses : [{
                             streetLine1: "",
                             streetLine2: "",
                             city: "",
@@ -101,26 +102,30 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
                 } finally {
                     setIsLoading(false);
                 }
-            });
+            };
+
+            fetchUserData();
         }
     }, [open, userId, form, roles]);
 
     // Form submission handler
     const handleSubmit = async (data: UpdateUserInput) => {
         setGlobalError("");
+        setIsPending(true);
 
-        startTransition(async () => {
-            try {
-                await updateUser(userId, data);
-                toast.success("User updated successfully!");
-                onOpenChange(false);
-                onUserUpdated?.();
-            } catch (error: any) {
-                const errorMessage = error.messages?.[0] || error.message || "Failed to update user";
-                setGlobalError(errorMessage);
-                toast.error(errorMessage);
-            }
-        });
+        try {
+            const response = await updateUser(userId, data);
+            const successMessage = response.message;
+            toast.success(successMessage);
+            onOpenChange(false);
+            onUserUpdated?.();
+        } catch (error: any) {
+            const errorMessage = error.messages?.[0] || error.message || "Failed to update user";
+            setGlobalError(errorMessage);
+            toast.error(errorMessage);
+        } finally {
+            setIsPending(false);
+        }
     };
 
     // Dialog close handler

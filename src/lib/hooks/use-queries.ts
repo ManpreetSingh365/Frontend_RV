@@ -19,6 +19,7 @@ export function useRolesQuery(viewMode: "hierarchy" | "list" = "hierarchy") {
     return useQuery({
         queryKey: [...QUERY_KEYS.roles, viewMode],
         queryFn: () => getRoles({ viewMode }),
+        select: (response) => response.data || [],
         staleTime: 5 * 60 * 1000, // 5 minutes (roles don't change often)
     });
 }
@@ -30,6 +31,7 @@ export function useVehiclesQuery() {
     return useQuery({
         queryKey: QUERY_KEYS.vehicles,
         queryFn: () => getVehicles({}),
+        select: (response) => response.data || [],
         staleTime: 2 * 60 * 1000, // 2 minutes
     });
 }
@@ -41,6 +43,7 @@ export function useAddressTypesQuery() {
     return useQuery({
         queryKey: QUERY_KEYS.addressTypes,
         queryFn: () => getAddressTypes(),
+        select: (response) => response.data || [],
         staleTime: 60 * 60 * 1000, // 1 hour (static data)
     });
 }

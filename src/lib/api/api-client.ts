@@ -9,7 +9,7 @@ function sleep(ms: number) {
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<T> {
+): Promise<ApiResponse<T>> {
 
   // Simulate backend delay
   // await sleep(5000);
@@ -38,18 +38,21 @@ async function apiRequest<T>(
     const apiResponse = body as ApiResponse<T>;
 
     if (apiResponse.success) {
-      return apiResponse.data as T;
+      return apiResponse;
     }
 
+    // Handle error response with success: false
+    // Backend sends { success: false, code, messages[], errors[] }
+    const errorBody = apiResponse as unknown as ApiErrorResponse;
     throw new ApiError(
       response.status,
-      apiResponse.message ? [apiResponse.message] : ["Request failed"],
-      []
+      errorBody?.messages || (apiResponse.message ? [apiResponse.message] : ["Request failed"]),
+      errorBody?.errors || []
     );
   }
 
   /**
-   * Case 2: Error response
+   * Case 2: Error response without success field
    */
   if (!response.ok) {
     const errorBody = body as ApiErrorResponse;
@@ -64,7 +67,13 @@ async function apiRequest<T>(
   /**
    * Case 3: Raw/ unwrapped response (fallback)
    */
-  return body as T;
+  return {
+    success: true,
+    data: body as T,
+    message: null,
+    errors: null,
+    meta: null,
+  };
 }
 
 async function apiRequestPaginated<T>(
@@ -98,10 +107,12 @@ async function apiRequestPaginated<T>(
       };
     }
 
+    // Handle error response with success: false
+    const errorBody = apiResponse as unknown as ApiErrorResponse;
     throw new ApiError(
       response.status,
-      apiResponse.message ? [apiResponse.message] : ["Request failed"],
-      []
+      errorBody?.messages || (apiResponse.message ? [apiResponse.message] : ["Request failed"]),
+      errorBody?.errors || []
     );
   }
 
