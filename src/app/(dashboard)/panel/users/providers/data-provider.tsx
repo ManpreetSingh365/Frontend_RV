@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useContext, useRef, useState, useEffect, type ReactNode } from "react";
-import { getRoles, type Role } from "@/lib/service/role.services";
-import { getVehicles, type VehicleResponse } from "@/lib/service/vehicle.services";
-import { getAddressTypes, type AddressTypeResponse } from "@/lib/service/type.services";
+import { createContext, useContext, type ReactNode } from "react";
+import { type Role } from "@/lib/service/role.services";
+import { type VehicleResponse } from "@/lib/service/vehicle.services";
+import { type AddressTypeResponse } from "@/lib/service/type.services";
+import { useRolesQuery, useVehiclesQuery, useAddressTypesQuery } from "@/lib/hooks/use-queries";
 
 // Context type definition
 interface UserDataContextValue {
@@ -12,66 +13,45 @@ interface UserDataContextValue {
     addressTypes: AddressTypeResponse[];
     loading: boolean;
     error: string | null;
+    refetch: () => void;
 }
 
 const UserDataContext = createContext<UserDataContextValue | undefined>(undefined);
 
 // Provider component
 export function UserDataProvider({ children }: { children: ReactNode }) {
-    const hasFetchedRef = useRef(false);
-    const [state, setState] = useState<UserDataContextValue>({
-        roles: [],
-        vehicles: [],
-        addressTypes: [],
-        loading: true,
-        error: null,
-    });
+    // Use TanStack Query hooks
+    // These handle caching, deduplication, and background updates automatically
+    const rolesQuery = useRolesQuery("hierarchy");
+    const vehiclesQuery = useVehiclesQuery();
+    const addressTypesQuery = useAddressTypesQuery();
 
-    useEffect(() => {
-        // Prevent double-fetch in React StrictMode (development mode)
-        if (hasFetchedRef.current) return;
-        hasFetchedRef.current = true;
+    // Aggregate loading and error states
+    const loading = rolesQuery.isLoading || vehiclesQuery.isLoading || addressTypesQuery.isLoading;
 
-        let isMounted = true;
+    const error =
+        rolesQuery.error?.message ||
+        vehiclesQuery.error?.message ||
+        addressTypesQuery.error?.message ||
+        null;
 
-        const fetchAllData = async () => {
-            try {
-                // Fetch all resources in parallel for optimal performance
-                const [roles, vehicles, addressTypes] = await Promise.all([
-                    getRoles({ viewMode: "hierarchy" }),
-                    getVehicles({}),
-                    getAddressTypes(),
-                ]);
+    // Combined refetch function
+    const refetch = () => {
+        rolesQuery.refetch();
+        vehiclesQuery.refetch();
+        addressTypesQuery.refetch();
+    };
 
-                if (isMounted) {
-                    setState({
-                        roles,
-                        vehicles,
-                        addressTypes,
-                        loading: false,
-                        error: null,
-                    });
-                }
-            } catch (err) {
-                if (isMounted) {
-                    setState(prev => ({
-                        ...prev,
-                        loading: false,
-                        error: err instanceof Error ? err.message : "Failed to fetch data",
-                    }));
-                    console.error("UserDataProvider fetch error:", err);
-                }
-            }
-        };
+    const value: UserDataContextValue = {
+        roles: rolesQuery.data || [],
+        vehicles: vehiclesQuery.data || [],
+        addressTypes: addressTypesQuery.data || [],
+        loading,
+        error,
+        refetch
+    };
 
-        fetchAllData();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    return <UserDataContext.Provider value={state}>{children}</UserDataContext.Provider>;
+    return <UserDataContext.Provider value={value}>{children}</UserDataContext.Provider>;
 }
 
 // Custom hook to consume the context

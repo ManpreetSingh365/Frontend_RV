@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useUsers } from "./hooks/use-users";
+import { useUsersQuery } from "./hooks/use-users";
 import PageHeader from "./components/PageHeader";
 import FilterBar from "./components/FilterBar";
 import UserTable from "./components/UserTable";
@@ -31,11 +31,16 @@ export default function UsersList({
     const [searchTerm, setSearchTerm] = useState(initialSearch);
     const [pageSize, setPageSize] = useState(initialPageSize);
 
-    const { users, meta, loading, error, refetch } = useUsers({
+    const { data, isLoading, isError, error, refetch } = useUsersQuery({
         page: currentPage,
         size: pageSize,
         search: searchTerm,
     });
+
+    const users = data?.data || [];
+    const meta = data?.meta || null;
+    const loading = isLoading;
+    const errorMessage = error ? (error as Error).message : null;
 
     // Sync state with URL (only when state changes, not when URL changes)
     useEffect(() => {
@@ -90,15 +95,15 @@ export default function UsersList({
                     </>
                 )}
 
-                {error && (
+                {isError && (
                     <ErrorState
                         title="Failed to load users"
-                        message={error}
+                        message={errorMessage || "An error occurred"}
                         onRetry={refetch}
                     />
                 )}
 
-                {!loading && !error && users.length === 0 && (
+                {!loading && !isError && users.length === 0 && (
                     <>
                         <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
                         <EmptyState
@@ -109,7 +114,7 @@ export default function UsersList({
                     </>
                 )}
 
-                {!loading && !error && users.length > 0 && (
+                {!loading && !isError && users.length > 0 && (
                     <>
                         <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
                         <UserTable users={users} onUserDeleted={refetch} />

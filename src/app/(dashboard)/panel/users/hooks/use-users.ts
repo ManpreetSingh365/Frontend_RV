@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import { getUsers, User } from "@/lib/service/user.service";
-import { PaginationMeta } from "@/lib/api/types";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { getUsers } from "@/lib/service/user.service";
+import { QUERY_KEYS } from "@/lib/hooks/use-queries";
 
 interface UseUsersParams {
     page: number;
@@ -8,62 +8,19 @@ interface UseUsersParams {
     search: string;
 }
 
-interface UseUsersReturn {
-    users: User[];
-    meta: PaginationMeta | null;
-    loading: boolean;
-    error: string | null;
-    refetch: () => void;
-}
-
-export function useUsers({ page, size, search }: UseUsersParams): UseUsersReturn {
-    const [state, setState] = useState<{
-        users: User[];
-        meta: PaginationMeta | null;
-        loading: boolean;
-        error: string | null;
-    }>({
-        users: [],
-        meta: null,
-        loading: true,
-        error: null,
-    });
-
-    const fetchUsers = useCallback(async () => {
-        setState((prev) => ({ ...prev, loading: true, error: null }));
-
-        try {
-            const response = await getUsers({
+export function useUsersQuery({ page, size, search }: UseUsersParams) {
+    return useQuery({
+        queryKey: [...QUERY_KEYS.users, { page, size, search }],
+        queryFn: () =>
+            getUsers({
                 page,
                 size,
                 search,
                 sortBy: "createdAt",
                 sortOrder: "DESC",
                 viewMode: "hierarchy",
-            });
-
-            setState({
-                users: response.data,
-                meta: response.meta,
-                loading: false,
-                error: null,
-            });
-        } catch (err) {
-            setState({
-                users: [],
-                meta: null,
-                loading: false,
-                error: err instanceof Error ? err.message : "Failed to fetch users",
-            });
-        }
-    }, [page, size, search]);
-
-    useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
-
-    return {
-        ...state,
-        refetch: fetchUsers,
-    };
+            }),
+        placeholderData: keepPreviousData, // Keep showing previous page data while fetching next page
+        staleTime: 30 * 1000, // 30 seconds
+    });
 }
