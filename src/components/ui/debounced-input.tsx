@@ -30,12 +30,14 @@ export function DebouncedInput({
 
     // Debounce the onChange callback
     React.useEffect(() => {
+        if (value === initialValue) return;
+
         const timeout = setTimeout(() => {
             onChange(value);
         }, debounceMs);
 
         return () => clearTimeout(timeout);
-    }, [value, debounceMs, onChange]);
+    }, [value, debounceMs, onChange, initialValue]);
 
     const handleClear = () => {
         setValue("");

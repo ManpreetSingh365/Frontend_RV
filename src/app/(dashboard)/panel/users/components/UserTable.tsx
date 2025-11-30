@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import { deleteUser, hardDeleteUser, User } from "@/lib/service/user.service";
@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Edit, Trash2, Loader2, MoreVertical, UserX } from "lucide-react";
 import { toast } from "sonner";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface UserTableProps {
     users: User[];
@@ -90,31 +89,31 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
 
     return (
         <>
-            <div className="w-screen -mx-4 md:-mx-8 mb-6">
-                <ScrollArea className="w-full">
-                    <div className="inline-block min-w-full align-middle">
-                        <div className="overflow-hidden border-y md:border-x md:rounded-xl bg-background">
-                            <Table>
+            <div className="w-full mb-4 sm:mb-6">
+                <div className="overflow-x-auto sm:overflow-hidden -mx-4 sm:mx-0 px-4 sm:px-0">
+                    <div className="min-w-full sm:min-w-0 inline-block sm:block">
+                        <div className="border-y sm:border-x sm:rounded-xl bg-background">
+                            <Table className="min-w-full sm:w-full sm:table-fixed">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-12 pl-4 md:pl-6">
+                                        <TableHead className="w-12 sm:w-[3%] pl-4 sm:pl-6 sticky left-0 sm:static z-[1] sm:z-auto bg-background">
                                             <Checkbox
                                                 checked={isAllSelected}
                                                 onCheckedChange={toggleSelectAll}
                                                 aria-label="Select all users"
                                             />
                                         </TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Username</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Mobile</TableHead>
-                                        <TableHead>Role</TableHead>
-                                        <TableHead>Created By</TableHead>
-                                        <TableHead className="text-center">Vehicles</TableHead>
-                                        <TableHead className="text-center">Credit</TableHead>
-                                        <TableHead>Created</TableHead>
-                                        <TableHead>Last Login</TableHead>
-                                        <TableHead className="pr-4 md:pr-6">Actions</TableHead>
+                                        <TableHead className="min-w-[80px] sm:w-[6%] text-xs sm:text-sm">Status</TableHead>
+                                        <TableHead className="min-w-[120px] sm:w-[9%] text-xs sm:text-sm">Username</TableHead>
+                                        <TableHead className="min-w-[120px] sm:w-[11%] text-xs sm:text-sm">Name</TableHead>
+                                        <TableHead className="min-w-[100px] sm:w-[10%] text-xs sm:text-sm">Mobile</TableHead>
+                                        <TableHead className="min-w-[80px] sm:w-[8%] text-xs sm:text-sm">Role</TableHead>
+                                        <TableHead className="min-w-[100px] sm:w-[9%] text-xs sm:text-sm">Created By</TableHead>
+                                        <TableHead className="text-center min-w-[80px] sm:w-[5%] text-xs sm:text-sm">Vehicles</TableHead>
+                                        <TableHead className="text-center min-w-[80px] sm:w-[5%] text-xs sm:text-sm">Credit</TableHead>
+                                        <TableHead className="min-w-[140px] sm:w-[12%] text-xs sm:text-sm">Created</TableHead>
+                                        <TableHead className="min-w-[140px] sm:w-[12%] text-xs sm:text-sm">Last Login</TableHead>
+                                        <TableHead className="pr-4 sm:pr-6 sticky right-0 sm:static z-[1] sm:z-auto bg-background min-w-[60px] sm:w-[6%]">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -131,14 +130,14 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
                                     ) : (
                                         users.map((user) => (
                                             <TableRow key={user.id}>
-                                                <TableCell className="pl-4 md:pl-6">
+                                                <TableCell className="pl-4 sm:pl-6 sticky left-0 sm:static z-[1] sm:z-auto bg-background py-3 sm:py-4">
                                                     <Checkbox
                                                         checked={selectedUsers.has(user.id)}
                                                         onCheckedChange={() => toggleSelectUser(user.id)}
                                                         aria-label={`Select ${user.username}`}
                                                     />
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell className="py-3 sm:py-4">
                                                     <span className={`inline-flex w-[60px] justify-center rounded-full border px-2 py-1 text-xs font-medium ${user.active
                                                         ? "border-green-500/40 bg-green-500/15 text-green-500"
                                                         : "border-red-500/40 bg-red-500/15 text-red-500"
@@ -146,32 +145,32 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
                                                         {user.active ? "Active" : "Inactive"}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell className="font-mono text-sm text-primary whitespace-nowrap">
+                                                <TableCell className="font-mono text-xs sm:text-sm text-primary whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {user.username}
                                                 </TableCell>
-                                                <TableCell className="font-medium whitespace-nowrap">
+                                                <TableCell className="font-medium whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {user.firstName} {user.lastName}
                                                 </TableCell>
-                                                <TableCell className="font-mono text-sm text-muted-foreground whitespace-nowrap">
+                                                <TableCell className="font-mono text-xs sm:text-sm text-muted-foreground whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {user.phoneNumber}
                                                 </TableCell>
-                                                <TableCell className="text-accent-foreground capitalize whitespace-nowrap">
+                                                <TableCell className="text-accent-foreground capitalize whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {user.role}
                                                 </TableCell>
-                                                <TableCell className="text-muted-foreground whitespace-nowrap">
+                                                <TableCell className="text-muted-foreground whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {user.createdBy}
                                                 </TableCell>
-                                                <TableCell className="text-center font-medium">
+                                                <TableCell className="text-center font-medium py-3 sm:py-4">
                                                     {user.vehiclesIds?.length || 0}
                                                 </TableCell>
-                                                <TableCell className="text-center">-</TableCell>
-                                                <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
+                                                <TableCell className="text-center py-3 sm:py-4">-</TableCell>
+                                                <TableCell className="text-muted-foreground text-xs sm:text-sm whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {formatDate(user.createdAt)}
                                                 </TableCell>
-                                                <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
+                                                <TableCell className="text-muted-foreground text-xs sm:text-sm whitespace-nowrap py-3 sm:py-4 truncate">
                                                     {formatDate(user.lastLogin)}
                                                 </TableCell>
-                                                <TableCell className="pr-4 md:pr-6">
+                                                <TableCell className="pr-4 sm:pr-6 sticky right-0 sm:static z-[1] sm:z-auto bg-background py-3 sm:py-4">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="ghost" size="icon" disabled={deletingUserId === user.id}>
@@ -214,8 +213,7 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
                             </Table>
                         </div>
                     </div>
-                    <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                </div>
             </div>
 
             {userToUpdate && (

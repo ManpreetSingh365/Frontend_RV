@@ -80,7 +80,7 @@ export default function UsersList({
 
     // Reusable layout wrapper
     const PageLayout = ({ children }: { children: React.ReactNode }) => (
-        <div className="w-full max-w-full p-4 md:p-8">{children}</div>
+        <div className="w-full max-w-full p-4 sm:p-6 md:p-8 overflow-x-hidden">{children}</div>
     );
 
     return (
@@ -120,7 +120,7 @@ export default function UsersList({
                         <UserTable users={users} onUserDeleted={refetch} />
                         {meta && (
                             <DataTablePagination
-                                currentPage={meta.currentPageNo}
+                                currentPage={currentPage}
                                 totalPages={meta.totalPages}
                                 totalItems={meta.totalElements}
                                 pageSize={pageSize}
