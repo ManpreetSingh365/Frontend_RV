@@ -80,7 +80,7 @@ export default function UsersList({
 
     // Reusable layout wrapper
     const PageLayout = ({ children }: { children: React.ReactNode }) => (
-        <div className="min-h-screen p-8">{children}</div>
+        <div className="w-full max-w-full p-4 md:p-8">{children}</div>
     );
 
     return (

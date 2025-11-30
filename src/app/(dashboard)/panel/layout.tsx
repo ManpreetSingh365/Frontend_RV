@@ -23,7 +23,7 @@ export default async function PanelLayout({
       <AppSidebar username={username} />
       <main className="w-full">
         <Navbar />
-        <div className="px-4">{children}</div>
+        <div>{children}</div>
       </main>
     </SidebarProvider>
   );
