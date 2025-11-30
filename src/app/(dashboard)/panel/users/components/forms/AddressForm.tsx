@@ -8,13 +8,13 @@ import type { CreateUserInput, UpdateUserInput } from "@/lib/validation/user.sch
 interface AddressFormProps {
     form: UseFormReturn<CreateUserInput> | UseFormReturn<UpdateUserInput>;
     addressTypeOptions: ComboboxOption[];
-    loadingAddressTypes: boolean;
+    loading: boolean;
 }
 
 export function AddressForm({
     form,
     addressTypeOptions,
-    loadingAddressTypes,
+    loading,
 }: AddressFormProps) {
     return (
         <div className="space-y-4">
@@ -148,7 +148,7 @@ export function AddressForm({
                                     value={field.value}
                                     onChange={field.onChange}
                                     options={addressTypeOptions}
-                                    loading={loadingAddressTypes}
+                                    loading={loading}
                                     placeholder="Select type"
                                     searchPlaceholder="Search address types..."
                                     emptyMessage="No address types found"

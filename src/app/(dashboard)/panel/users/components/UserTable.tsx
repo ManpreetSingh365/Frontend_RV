@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { deleteUser, hardDeleteUser, User } from "@/lib/service/user.service";
 import UpdateUserDialog from "./UpdateUserDialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -20,7 +20,7 @@ interface UserTableProps {
 export default function UserTable({ users, onUserDeleted }: UserTableProps) {
     const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
     const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
 
     // AlertDialog state
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,7 +38,11 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
 
     const toggleSelectUser = (userId: string) => {
         const newSelected = new Set(selectedUsers);
-        newSelected.has(userId) ? newSelected.delete(userId) : newSelected.add(userId);
+        if (newSelected.has(userId)) {
+            newSelected.delete(userId);
+        } else {
+            newSelected.add(userId);
+        }
         setSelectedUsers(newSelected);
     };
 
@@ -332,13 +336,13 @@ export default function UserTable({ users, onUserDeleted }: UserTableProps) {
                             {userToDelete?.isHard ? (
                                 <>
                                     This will <strong>permanently delete</strong> the user{" "}
-                                    <span className="font-semibold text-foreground">"{userToDelete?.username}"</span> from the System.
-                                    Can't Restore Back.
+                                    <span className="font-semibold text-foreground">&quot;{userToDelete?.username}&quot;</span> from the System.
+                                    Can&apos;t Restore Back.
                                 </>
                             ) : (
                                 <>
                                     This will delete the user{" "}
-                                    <span className="font-semibold text-foreground">"{userToDelete?.username}"</span>.
+                                    <span className="font-semibold text-foreground">&quot;{userToDelete?.username}&quot;</span>.
                                     You may be able to restore this user later.
                                 </>
                             )}

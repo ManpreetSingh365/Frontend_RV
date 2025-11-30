@@ -12,9 +12,7 @@ import { toast } from "sonner";
 
 import { getUserById, updateUser, type User } from "@/lib/service/user.service";
 import { updateUserSchema, type UpdateUserInput } from "@/lib/validation/user.schema";
-import { useRoles } from "../hooks/use-roles";
-import { useAddressTypes } from "../hooks/use-address-types";
-import { useVehicles } from "../hooks/useVehicles";
+import { useUserData } from "../providers/data-provider";
 import { UpdateUserDetailsForm } from "./forms/UpdateUserDetailsForm";
 import { AddressForm } from "./forms/AddressForm";
 import { transformRolesToOptions, transformVehiclesToOptions, transformAddressTypesToOptions } from "../utils/form-utils";
@@ -31,10 +29,8 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
     const [globalError, setGlobalError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch data
-    const { roles, loading: loadingRoles } = useRoles();
-    const { vehicles, loading: loadingVehicles } = useVehicles();
-    const { addressTypes, loading: loadingAddressTypes } = useAddressTypes();
+    // Use centralized data from context - NO redundant API calls!
+    const { roles, vehicles, addressTypes, loading: dataLoading } = useUserData();
 
     // Transform data to combobox options
     const roleOptions = useMemo(() => transformRolesToOptions(roles), [roles]);
@@ -161,15 +157,14 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
                                 form={form}
                                 roleOptions={roleOptions}
                                 vehicleOptions={vehicleOptions}
-                                loadingRoles={loadingRoles}
-                                loadingVehicles={loadingVehicles}
+                                loading={dataLoading}
                             />
 
                             {/* Address Section */}
                             <AddressForm
                                 form={form}
                                 addressTypeOptions={addressTypeOptions}
-                                loadingAddressTypes={loadingAddressTypes}
+                                loading={dataLoading}
                             />
 
                             {/* Form Actions */}

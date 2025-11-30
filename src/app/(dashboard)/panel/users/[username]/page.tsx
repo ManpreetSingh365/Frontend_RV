@@ -20,15 +20,12 @@ import { Button } from "@/components/ui/button";
 import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/chart/AppLineChart";
-import { NextRequest } from "next/server";
-import { cookies } from "next/headers";
+
 
 export default async function SingleUserPage({
   params,
-  req,
 }: {
   params: Promise<{ role: string; username: string }>;
-  req: NextRequest;
 }) {
   const { role, username } = await params;
   console.log("role | username: " + role + username);

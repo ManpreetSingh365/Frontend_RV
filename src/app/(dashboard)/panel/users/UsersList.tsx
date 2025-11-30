@@ -10,6 +10,7 @@ import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
+import { UserDataProvider } from "./providers/data-provider";
 
 interface UsersListProps {
     initialPage?: number;
@@ -77,58 +78,54 @@ export default function UsersList({
         <div className="min-h-screen p-8">{children}</div>
     );
 
-    if (loading) {
-        return (
-            <PageLayout>
-                <PageHeader onUserCreated={refetch} />
-                <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-                <LoadingState rows={5} />
-            </PageLayout>
-        );
-    }
-
-    if (error) {
-        return (
-            <PageLayout>
-                <PageHeader onUserCreated={refetch} />
-                <ErrorState
-                    title="Failed to load users"
-                    message={error}
-                    onRetry={refetch}
-                />
-            </PageLayout>
-        );
-    }
-
-    if (users.length === 0) {
-        return (
-            <PageLayout>
-                <PageHeader onUserCreated={refetch} />
-                <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-                <EmptyState
-                    icon="search"
-                    title="No users found"
-                    message={searchTerm ? `No results for "${searchTerm}"` : "No users have been added yet"}
-                />
-            </PageLayout>
-        );
-    }
-
     return (
-        <PageLayout>
-            <PageHeader onUserCreated={refetch} />
-            <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-            <UserTable users={users} onUserDeleted={refetch} />
-            {meta && (
-                <DataTablePagination
-                    currentPage={meta.currentPageNo}
-                    totalPages={meta.totalPages}
-                    totalItems={meta.totalElements}
-                    pageSize={pageSize}
-                    onPageChange={setCurrentPage}
-                    onPageSizeChange={handlePageSizeChange}
-                />
-            )}
-        </PageLayout>
+        <UserDataProvider>
+            <PageLayout>
+                <PageHeader onUserCreated={refetch} />
+
+                {loading && (
+                    <>
+                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                        <LoadingState rows={5} />
+                    </>
+                )}
+
+                {error && (
+                    <ErrorState
+                        title="Failed to load users"
+                        message={error}
+                        onRetry={refetch}
+                    />
+                )}
+
+                {!loading && !error && users.length === 0 && (
+                    <>
+                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                        <EmptyState
+                            icon="search"
+                            title="No users found"
+                            message={searchTerm ? `No results for "${searchTerm}"` : "No users have been added yet"}
+                        />
+                    </>
+                )}
+
+                {!loading && !error && users.length > 0 && (
+                    <>
+                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                        <UserTable users={users} onUserDeleted={refetch} />
+                        {meta && (
+                            <DataTablePagination
+                                currentPage={meta.currentPageNo}
+                                totalPages={meta.totalPages}
+                                totalItems={meta.totalElements}
+                                pageSize={pageSize}
+                                onPageChange={setCurrentPage}
+                                onPageSizeChange={handlePageSizeChange}
+                            />
+                        )}
+                    </>
+                )}
+            </PageLayout>
+        </UserDataProvider>
     );
 }

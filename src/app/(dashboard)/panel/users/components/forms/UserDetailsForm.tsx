@@ -9,16 +9,14 @@ interface UserDetailsFormProps {
     form: UseFormReturn<CreateUserInput>;
     roleOptions: ComboboxOption[];
     vehicleOptions: ComboboxOption[];
-    loadingRoles: boolean;
-    loadingVehicles: boolean;
+    loading: boolean;
 }
 
 export function UserDetailsForm({
     form,
     roleOptions,
     vehicleOptions,
-    loadingRoles,
-    loadingVehicles,
+    loading,
 }: UserDetailsFormProps) {
     return (
         <div className="space-y-4">
@@ -125,7 +123,7 @@ export function UserDetailsForm({
                                     value={field.value || ""}
                                     onChange={field.onChange}
                                     options={roleOptions}
-                                    loading={loadingRoles}
+                                    loading={loading}
                                     placeholder="Select role"
                                     searchPlaceholder="Search roles..."
                                     emptyMessage="No roles found"
@@ -146,7 +144,7 @@ export function UserDetailsForm({
                                     value={field.value || []}
                                     onChange={field.onChange}
                                     options={vehicleOptions}
-                                    loading={loadingVehicles}
+                                    loading={loading}
                                     placeholder="Select vehicles..."
                                     searchPlaceholder="Search vehicles..."
                                     emptyMessage="No vehicles found"

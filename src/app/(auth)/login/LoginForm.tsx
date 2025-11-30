@@ -50,7 +50,7 @@ export function LoginForm({
                                 <div className="flex flex-col items-center gap-2 text-center mb-2">
                                     <h1 className="text-2xl font-bold">Welcome back 👋</h1>
                                     <p className="text-muted-foreground">
-                                        Let's Hit the Road with RouteVision 🚚
+                                        Let&apos;s Hit the Road with RouteVision 🚚
                                     </p>
                                 </div>
 
