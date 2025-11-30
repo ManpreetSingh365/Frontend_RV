@@ -43,24 +43,28 @@ export const getUsers = (params?: {
     page?: number;
     size?: number;
     search?: string;
+    role?: string;
     sortBy?: string;
     sortOrder?: string;
     viewMode?: string;
 }) => {
-    const queryParams: Record<string, string> = {};
+    const requestBody = {
+        pagination: {
+            page: params?.page ?? 1,
+            size: params?.size ?? 10,
+        },
+        sort: {
+            by: params?.sortBy ?? "createdAt",
+            order: params?.sortOrder ?? "DESC",
+        },
+        filters: {
+            search: params?.search ?? "",
+            role: params?.role ?? "",
+            viewMode: params?.viewMode ?? "hierarchy",
+        },
+    };
 
-    if (params?.page) queryParams.page = String(params.page);
-    if (params?.size) queryParams.size = String(params.size);
-    if (params?.search) queryParams.search = params.search;
-    if (params?.sortBy) queryParams.sortBy = params.sortBy;
-    if (params?.sortOrder) queryParams.sortOrder = params.sortOrder;
-    if (params?.viewMode) queryParams.viewMode = params.viewMode;
-
-    const query = Object.keys(queryParams).length > 0
-        ? `?${new URLSearchParams(queryParams).toString()}`
-        : "";
-
-    return apiClient.getPaginated<User>(`/users${query}`);
+    return apiClient.postPaginated<typeof requestBody, User>("/users/search", requestBody);
 };
 
 // GET USER BY ID

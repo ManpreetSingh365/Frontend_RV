@@ -30,11 +30,13 @@ export default function UsersList({
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [searchTerm, setSearchTerm] = useState(initialSearch);
     const [pageSize, setPageSize] = useState(initialPageSize);
+    const [selectedRole, setSelectedRole] = useState("all");
 
     const { data, isLoading, isError, error, refetch } = useUsersQuery({
         page: currentPage,
         size: pageSize,
         search: searchTerm,
+        role: selectedRole === "all" ? "" : selectedRole,
     });
 
     const users = data?.data || [];
@@ -64,12 +66,21 @@ export default function UsersList({
             params.set("size", pageSize.toString());
         }
 
+        if (selectedRole && selectedRole !== "all") {
+            params.set("role", selectedRole);
+        }
+
         const newUrl = params.toString() ? `?${params.toString()}` : "/panel/users";
         router.replace(newUrl, { scroll: false });
-    }, [currentPage, searchTerm, pageSize, router]);
+    }, [currentPage, searchTerm, pageSize, selectedRole, router]);
 
     const handleSearchChange = useCallback((search: string) => {
         setSearchTerm(search);
+        setCurrentPage(1);
+    }, []);
+
+    const handleRoleChange = useCallback((role: string) => {
+        setSelectedRole(role);
         setCurrentPage(1);
     }, []);
 
@@ -90,7 +101,7 @@ export default function UsersList({
 
                 {loading && (
                     <>
-                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} selectedRole={selectedRole} onRoleChange={handleRoleChange} />
                         <LoadingState rows={5} />
                     </>
                 )}
@@ -105,7 +116,7 @@ export default function UsersList({
 
                 {!loading && !isError && users.length === 0 && (
                     <>
-                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} selectedRole={selectedRole} onRoleChange={handleRoleChange} />
                         <EmptyState
                             icon="search"
                             title="No users found"
@@ -116,7 +127,7 @@ export default function UsersList({
 
                 {!loading && !isError && users.length > 0 && (
                     <>
-                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+                        <FilterBar searchTerm={searchTerm} onSearchChange={handleSearchChange} selectedRole={selectedRole} onRoleChange={handleRoleChange} />
                         <UserTable users={users} onUserDeleted={refetch} />
                         {meta && (
                             <DataTablePagination

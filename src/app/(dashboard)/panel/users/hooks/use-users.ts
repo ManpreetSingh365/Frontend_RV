@@ -6,16 +6,18 @@ interface UseUsersParams {
     page: number;
     size: number;
     search: string;
+    role?: string;
 }
 
-export function useUsersQuery({ page, size, search }: UseUsersParams) {
+export function useUsersQuery({ page, size, search, role }: UseUsersParams) {
     return useQuery({
-        queryKey: [...QUERY_KEYS.users, { page, size, search }],
+        queryKey: [...QUERY_KEYS.users, { page, size, search, role }],
         queryFn: () =>
             getUsers({
                 page,
                 size,
                 search,
+                role,
                 sortBy: "createdAt",
                 sortOrder: "DESC",
                 viewMode: "hierarchy",

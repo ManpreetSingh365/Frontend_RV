@@ -124,11 +124,18 @@ export const apiClient = {
   get: <T>(endpoint: string) =>
     apiRequest<T>(endpoint, { method: "GET" }),
 
+  // not needed, use getPaginated
   getPaginated: <T>(endpoint: string) =>
     apiRequestPaginated<T>(endpoint, { method: "GET" }),
 
   post: <Req, Res>(endpoint: string, body: Req) =>
     apiRequest<Res>(endpoint, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  postPaginated: <Req, Res>(endpoint: string, body: Req) =>
+    apiRequestPaginated<Res>(endpoint, {
       method: "POST",
       body: JSON.stringify(body),
     }),
