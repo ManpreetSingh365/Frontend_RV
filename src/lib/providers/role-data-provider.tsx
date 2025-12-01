@@ -2,6 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import { usePermissionsQuery } from "@/lib/hooks/use-queries";
+import { useEntityData } from "@/lib/hooks/use-entity-data";
 import type { PermissionCategory } from "@/lib/util/permission-utils";
 
 interface RoleDataContextValue {
@@ -16,12 +17,9 @@ const RoleDataContext = createContext<RoleDataContextValue | undefined>(undefine
 export function RoleDataProvider({ children }: { children: ReactNode }) {
     const permissionsQuery = usePermissionsQuery();
 
-    const value: RoleDataContextValue = {
-        permissionCategories: permissionsQuery.data || [],
-        loading: permissionsQuery.isLoading,
-        error: permissionsQuery.error?.message || null,
-        refetch: permissionsQuery.refetch
-    };
+    const value = useEntityData({
+        permissionCategories: { query: permissionsQuery },
+    });
 
     return <RoleDataContext.Provider value={value}>{children}</RoleDataContext.Provider>;
 }

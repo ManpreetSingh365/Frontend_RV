@@ -9,7 +9,7 @@ import { Loader2, Plus } from "lucide-react";
 
 import { createRole } from "@/lib/service/role.services";
 import { createRoleSchema, type CreateRoleInput } from "@/lib/validation/role.schema";
-import { useRoleData } from "../providers/data-provider";
+import { useRoleData } from "@/lib/providers/role-data-provider";
 import { RoleDetailsForm } from "./forms/RoleDetailsForm";
 import { INITIAL_ROLE_FORM_VALUES } from "../constants/form-defaults";
 import { EntityDialog } from "@/components/shared/dialogs/EntityDialog";

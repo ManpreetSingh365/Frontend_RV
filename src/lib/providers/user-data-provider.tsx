@@ -5,8 +5,8 @@ import { type Role } from "@/lib/service/role.services";
 import { type VehicleResponse } from "@/lib/service/vehicle.services";
 import { type AddressTypeResponse } from "@/lib/service/type.services";
 import { useRolesQuery, useVehiclesQuery, useAddressTypesQuery } from "@/lib/hooks/use-queries";
+import { useEntityData } from "@/lib/hooks/use-entity-data";
 
-// Context type definition
 interface UserDataContextValue {
     roles: Role[];
     vehicles: VehicleResponse[];
@@ -18,43 +18,20 @@ interface UserDataContextValue {
 
 const UserDataContext = createContext<UserDataContextValue | undefined>(undefined);
 
-// Provider component
 export function UserDataProvider({ children }: { children: ReactNode }) {
-    // Use TanStack Query hooks
-    // These handle caching, deduplication, and background updates automatically
-    const rolesQuery = useRolesQuery("hierarchy");
+    const rolesQuery = useRolesQuery({ viewMode: "hierarchy" });
     const vehiclesQuery = useVehiclesQuery();
     const addressTypesQuery = useAddressTypesQuery();
 
-    // Aggregate loading and error states
-    const loading = rolesQuery.isLoading || vehiclesQuery.isLoading || addressTypesQuery.isLoading;
-
-    const error =
-        rolesQuery.error?.message ||
-        vehiclesQuery.error?.message ||
-        addressTypesQuery.error?.message ||
-        null;
-
-    // Combined refetch function
-    const refetch = () => {
-        rolesQuery.refetch();
-        vehiclesQuery.refetch();
-        addressTypesQuery.refetch();
-    };
-
-    const value: UserDataContextValue = {
-        roles: rolesQuery.data || [],
-        vehicles: vehiclesQuery.data || [],
-        addressTypes: addressTypesQuery.data || [],
-        loading,
-        error,
-        refetch
-    };
+    const value = useEntityData({
+        roles: { query: rolesQuery },
+        vehicles: { query: vehiclesQuery },
+        addressTypes: { query: addressTypesQuery },
+    });
 
     return <UserDataContext.Provider value={value}>{children}</UserDataContext.Provider>;
 }
 
-// Custom hook to consume the context
 export function useUserData() {
     const context = useContext(UserDataContext);
     if (!context) {

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useUsersQuery } from "./hooks/use-users";
 import PageHeader from "./components/PageHeader";
 import FilterBar from "./components/FilterBar";
 import UserTable from "./components/UserTable";
@@ -10,7 +9,8 @@ import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { UserDataProvider } from "./providers/data-provider";
+import { UserDataProvider, useUserData } from "@/lib/providers/user-data-provider";
+import { useUsersQuery } from "@/lib/hooks/use-queries";
 
 interface UsersListProps {
     initialPage?: number;

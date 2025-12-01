@@ -9,14 +9,13 @@ import { Form } from "@/components/ui/form";
 import { AlertMessage } from "@/components/ui/alert-message";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
 import { getUserById, updateUser, type User } from "@/lib/service/user.service";
 import { updateUserSchema, type UpdateUserInput } from "@/lib/validation/user.schema";
-import { useUserData } from "../providers/data-provider";
 import { UpdateUserDetailsForm } from "./forms/UpdateUserDetailsForm";
 import { AddressForm } from "./forms/AddressForm";
-import { transformRolesToOptions, transformVehiclesToOptions, transformAddressTypesToOptions } from "../utils/form-utils";
+import { transformToComboboxOptions } from "@/lib/utils/entity-transforms";
 import { handleApiFormErrors } from "@/lib/util/form-errors";
+import { useUserData } from "@/lib/providers/user-data-provider";
 
 interface UpdateUserDialogProps {
     userId: string;
@@ -34,9 +33,15 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
     const { roles, vehicles, addressTypes, loading: dataLoading } = useUserData();
 
     // Transform data to combobox options
-    const roleOptions = useMemo(() => transformRolesToOptions(roles), [roles]);
-    const vehicleOptions = useMemo(() => transformVehiclesToOptions(vehicles), [vehicles]);
-    const addressTypeOptions = useMemo(() => transformAddressTypesToOptions(addressTypes), [addressTypes]);
+    const roleOptions = useMemo(() => transformToComboboxOptions(roles), [roles]);
+    const vehicleOptions = useMemo(() => transformToComboboxOptions(vehicles.map(v => ({
+        id: v.id,
+        name: `${v.licensePlate} (${v.brand} ${v.model})`
+    }))), [vehicles]);
+    const addressTypeOptions = useMemo(() => addressTypes.map(at => ({
+        value: at.name,
+        label: at.description
+    })), [addressTypes]);
 
     // Form setup
     const form = useForm<UpdateUserInput>({
@@ -74,7 +79,7 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
                     const userData = response.data;
 
                     // Find role ID from role name
-                    const userRoleId = roles.find(r => r.name === userData?.role)?.id || "";
+                    const userRoleId = roles.find((r: { id: string; name: string }) => r.name === userData?.role)?.id || "";
 
                     // Prefill form with existing data
                     form.reset({

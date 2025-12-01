@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { DebouncedInput } from "@/components/ui/debounced-input";
 import { Search } from "lucide-react";
-import { useUserData } from "../providers/data-provider";
+import { useUserData } from "@/lib/providers/user-data-provider";
 
 interface FilterBarProps {
     searchTerm: string;

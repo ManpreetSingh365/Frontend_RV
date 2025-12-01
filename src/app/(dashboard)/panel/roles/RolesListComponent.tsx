@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRolesQuery } from "./hooks/use-roles";
+import { useRolesPaginatedQuery } from "@/lib/hooks/use-queries";
 import PageHeader from "./components/PageHeader";
 import FilterBar from "./components/FilterBar";
 import RoleTable from "./components/RoleTable";
@@ -10,13 +10,14 @@ import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { RoleDataProvider } from "./providers/data-provider";
+import { RoleDataProvider } from "@/lib/providers/role-data-provider";
 
 interface RolesListProps {
     initialPage?: number;
     initialSearch?: string;
     initialPageSize?: number;
 }
+
 
 export default function RolesList({
     initialPage = 1,
@@ -31,7 +32,7 @@ export default function RolesList({
     const [searchTerm, setSearchTerm] = useState(initialSearch);
     const [pageSize, setPageSize] = useState(initialPageSize);
 
-    const { data, isLoading, isError, error, refetch } = useRolesQuery({
+    const { data, isLoading, isError, error, refetch } = useRolesPaginatedQuery({
         page: currentPage,
         size: pageSize,
         search: searchTerm,

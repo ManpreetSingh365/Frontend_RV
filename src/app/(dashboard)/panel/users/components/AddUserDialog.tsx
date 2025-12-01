@@ -12,12 +12,12 @@ import { toast } from "sonner";
 
 import { createUser } from "@/lib/service/user.service";
 import { createUserSchema, type CreateUserInput } from "@/lib/validation/user.schema";
-import { useUserData } from "../providers/data-provider";
 import { UserDetailsForm } from "./forms/UserDetailsForm";
 import { AddressForm } from "./forms/AddressForm";
-import { transformRolesToOptions, transformVehiclesToOptions, transformAddressTypesToOptions } from "../utils/form-utils";
 import { INITIAL_USER_FORM_VALUES } from "../constants/form-defaults";
 import { handleApiFormErrors } from "@/lib/util/form-errors";
+import { useUserData } from "@/lib/providers/user-data-provider";
+import { transformToComboboxOptions } from "@/lib/utils/entity-transforms";
 
 interface AddUserDialogProps {
     onUserCreated?: () => void;
@@ -33,9 +33,15 @@ export default function AddUserDialog({ onUserCreated, children }: AddUserDialog
     const { roles, vehicles, addressTypes, loading } = useUserData();
 
     // Transform data to combobox options
-    const roleOptions = useMemo(() => transformRolesToOptions(roles), [roles]);
-    const vehicleOptions = useMemo(() => transformVehiclesToOptions(vehicles), [vehicles]);
-    const addressTypeOptions = useMemo(() => transformAddressTypesToOptions(addressTypes), [addressTypes]);
+    const roleOptions = useMemo(() => transformToComboboxOptions(roles), [roles]);
+    const vehicleOptions = useMemo(() => transformToComboboxOptions(vehicles.map(v => ({
+        id: v.id,
+        name: `${v.licensePlate} (${v.brand} ${v.model})`
+    }))), [vehicles]);
+    const addressTypeOptions = useMemo(() => addressTypes.map(at => ({
+        value: at.name,
+        label: at.description
+    })), [addressTypes]);
 
     // Form setup
     const form = useForm<CreateUserInput>({
