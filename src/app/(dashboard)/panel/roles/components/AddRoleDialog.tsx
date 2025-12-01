@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { AlertMessage } from "@/components/ui/alert-message";
 import { Loader2, Plus } from "lucide-react";
-import { toast } from "sonner";
 
 import { createRole } from "@/lib/service/role.services";
 import { createRoleSchema, type CreateRoleInput } from "@/lib/validation/role.schema";
 import { useRoleData } from "../providers/data-provider";
 import { RoleDetailsForm } from "./forms/RoleDetailsForm";
 import { INITIAL_ROLE_FORM_VALUES } from "../constants/form-defaults";
-import { handleApiFormErrors } from "@/lib/util/form-errors";
+import { EntityDialog } from "@/components/shared/dialogs/EntityDialog";
+import { useEntityForm } from "@/hooks/use-entity-form";
 
 interface AddRoleDialogProps {
     onRoleCreated?: () => void;
@@ -23,12 +21,6 @@ interface AddRoleDialogProps {
 }
 
 export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialogProps) {
-    const [open, setOpen] = useState(false);
-    const [isPending, setIsPending] = useState(false);
-    const [globalError, setGlobalError] = useState("");
-
-    // const { permissions, loading } = useRoleData();
-    // const permissionOptions = useMemo(() => transformPermissionsToOptions(permissions), [permissions]);
     const { permissionCategories, loading } = useRoleData();
 
     const form = useForm<CreateRoleInput>({
@@ -36,54 +28,28 @@ export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialog
         defaultValues: INITIAL_ROLE_FORM_VALUES as CreateRoleInput,
     });
 
-    const handleSubmit = async (data: CreateRoleInput) => {
-        setGlobalError("");
-        setIsPending(true);
-
-        try {
-            const response = await createRole(data);
-            toast.success(response.message || "Role created successfully");
-            setOpen(false);
-            form.reset();
-            onRoleCreated?.();
-        } catch (error: any) {
-            const errorMessage = handleApiFormErrors(error, form.setError);
-            if (errorMessage) {
-                setGlobalError(errorMessage);
-                toast.error(errorMessage);
-            }
-        } finally {
-            setIsPending(false);
-        }
-    };
-
-    const handleOpenChange = (isOpen: boolean) => {
-        setOpen(isOpen);
-        if (!isOpen) {
-            form.reset();
-            setGlobalError("");
-        }
-    };
+    const { handleSubmit, isPending, globalError } = useEntityForm({
+        form,
+        onSubmit: createRole,
+        successMessage: "Role created successfully",
+        onSuccess: onRoleCreated
+    });
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                {children || (
+        <EntityDialog
+            trigger={
+                children || (
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
                         Add New Role
                     </Button>
-                )}
-            </DialogTrigger>
-
-            <DialogContent className="max-h-[90vh] w-full overflow-y-auto !max-w-[800px] sm:w-[95vw] md:w-[80vw] lg:w-[60vw]">
-                <DialogHeader>
-                    <DialogTitle>Add New Role</DialogTitle>
-                    <DialogDescription>
-                        Create a new role with specific permissions.
-                    </DialogDescription>
-                </DialogHeader>
-
+                )
+            }
+            title="Add New Role"
+            description="Create a new role with specific permissions."
+            maxWidth="lg"
+        >
+            {({ onCancel }) => (
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                         <AlertMessage message={globalError} variant="error" />
@@ -97,7 +63,7 @@ export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialog
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => setOpen(false)}
+                                    onClick={onCancel}
                                     disabled={isPending}
                                 >
                                     Cancel
@@ -110,7 +76,7 @@ export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialog
                         </RoleDetailsForm>
                     </form>
                 </Form>
-            </DialogContent>
-        </Dialog>
+            )}
+        </EntityDialog>
     );
 }
