@@ -12,6 +12,8 @@ import {
     optional,
     boolean,
     minValue,
+    union,
+    literal,
 } from "valibot";
 
 /**
@@ -93,8 +95,8 @@ export const createUserSchema = object({
 
     phoneNumber: pipe(
         string(),
-        maxLength(15, "Phone number must not exceed 15 characters"),
-        regex(/^\+?[1-9]\d{9,14}$/, "Please enter a valid phone number (e.g., +919876543210)")
+        maxLength(20, "Phone number must not exceed 20 characters"),
+        regex(/^[\d\s\(\)\-\+]+$/, "Please enter a valid phone number")
     ),
 
     vehicleCreditLimit: optional(
@@ -105,10 +107,10 @@ export const createUserSchema = object({
     ),
 
     roleId: optional(
-        pipe(
-            string(),
-            regex(uuidRegex, "Role ID must be a valid UUID")
-        )
+        union([
+            literal(""),
+            pipe(string(), regex(uuidRegex, "Role ID must be a valid UUID")),
+        ])
     ),
 
     vehicleIds: optional(
@@ -174,15 +176,15 @@ export const updateUserSchema = object({
 
     phoneNumber: pipe(
         string(),
-        maxLength(15, "Phone number must not exceed 15 characters"),
-        regex(/^\+?[1-9]\d{9,14}$/, "Please enter a valid phone number (e.g., +919876543210)")
+        maxLength(20, "Phone number must not exceed 20 characters"),
+        regex(/^[\d\s\(\)\-\+]+$/, "Please enter a valid phone number")
     ),
 
     roleId: optional(
-        pipe(
-            string(),
-            regex(uuidRegex, "Role ID must be a valid UUID")
-        )
+        union([
+            literal(""),
+            pipe(string(), regex(uuidRegex, "Role ID must be a valid UUID")),
+        ])
     ),
 
     vehicleIds: optional(

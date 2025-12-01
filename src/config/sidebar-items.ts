@@ -9,7 +9,7 @@ import {
   TrendingUp,
   Settings,
   HelpCircle,
-  Map
+  Map,
 } from "lucide-react";
 
 // ---------- ICON MAP ----------
@@ -45,6 +45,7 @@ export const getSidebarItems = (username?: string) => {
     title: "FLEET MANAGEMENT",
     items: [
       { name: "Users", icon: "user", path: `/panel/users` },
+      { name: "Roles", icon: "", path: `/panel/roles` },
       {
         name: `User: ${username}`,
         icon: "user",

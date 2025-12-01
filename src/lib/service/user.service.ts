@@ -30,6 +30,15 @@ export type User = {
     }>;
 };
 
+export interface UserQueryParams {
+    page?: number;
+    size?: number;
+    search?: string;
+    role?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    viewMode?: string;
+}
 
 /* ================= USER CRUD ================= */
 // Current, only use getUsers, deleteUser, hardDeleteUser from user.service.ts not from user.actions.ts
@@ -39,15 +48,7 @@ export const createUser = (payload: CreateUserInput) =>
     apiClient.post<CreateUserInput, User>("/users", payload);
 
 // GET ALL USERS (with optional pagination)
-export const getUsers = (params?: {
-    page?: number;
-    size?: number;
-    search?: string;
-    role?: string;
-    sortBy?: string;
-    sortOrder?: string;
-    viewMode?: string;
-}) => {
+export const getUsers = (params?: UserQueryParams) => {
     const requestBody = {
         pagination: {
             page: params?.page ?? 1,

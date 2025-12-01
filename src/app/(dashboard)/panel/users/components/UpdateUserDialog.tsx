@@ -16,6 +16,7 @@ import { useUserData } from "../providers/data-provider";
 import { UpdateUserDetailsForm } from "./forms/UpdateUserDetailsForm";
 import { AddressForm } from "./forms/AddressForm";
 import { transformRolesToOptions, transformVehiclesToOptions, transformAddressTypesToOptions } from "../utils/form-utils";
+import { handleApiFormErrors } from "@/lib/util/form-errors";
 
 interface UpdateUserDialogProps {
     userId: string;
@@ -96,9 +97,11 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
                         }],
                     });
                 } catch (error: any) {
-                    const errorMessage = error.messages?.[0] || error.message || "Failed to load user data";
-                    setGlobalError(errorMessage);
-                    toast.error(errorMessage);
+                    const errorMessage = handleApiFormErrors(error, form.setError);
+                    if (errorMessage) {
+                        setGlobalError(errorMessage);
+                        toast.error(errorMessage);
+                    }
                 } finally {
                     setIsLoading(false);
                 }
@@ -120,9 +123,11 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
             onOpenChange(false);
             onUserUpdated?.();
         } catch (error: any) {
-            const errorMessage = error.messages?.[0] || error.message || "Failed to update user";
-            setGlobalError(errorMessage);
-            toast.error(errorMessage);
+            const errorMessage = handleApiFormErrors(error, form.setError);
+            if (errorMessage) {
+                setGlobalError(errorMessage);
+                toast.error(errorMessage);
+            }
         } finally {
             setIsPending(false);
         }

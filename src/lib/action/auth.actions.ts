@@ -19,7 +19,7 @@ export interface LoginFormState {
  * Client-side login action - handles business logic
  * This runs in the BROWSER, not on the server
  * Compatible with React's useActionState hook
- * 
+ *
  * @param prevState - Previous form state (from useActionState)
  * @param formData - FormData from the form submission
  * @returns Promise<LoginFormState> - New state with success/error

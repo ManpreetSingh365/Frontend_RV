@@ -17,7 +17,7 @@ import { UserDetailsForm } from "./forms/UserDetailsForm";
 import { AddressForm } from "./forms/AddressForm";
 import { transformRolesToOptions, transformVehiclesToOptions, transformAddressTypesToOptions } from "../utils/form-utils";
 import { INITIAL_USER_FORM_VALUES } from "../constants/form-defaults";
-import { createUserAction } from "@/lib/action/user.actions";
+import { handleApiFormErrors } from "@/lib/util/form-errors";
 
 interface AddUserDialogProps {
     onUserCreated?: () => void;
@@ -55,9 +55,11 @@ export default function AddUserDialog({ onUserCreated, children }: AddUserDialog
             form.reset();
             onUserCreated?.();
         } catch (error: any) {
-            const errorMessage = error.messages?.[0] || error.message || "Failed to create user";
-            setGlobalError(errorMessage);
-            toast.error(errorMessage);
+            const errorMessage = handleApiFormErrors(error, form.setError);
+            if (errorMessage) {
+                setGlobalError(errorMessage);
+                toast.error(errorMessage);
+            }
         } finally {
             setIsPending(false);
         }
