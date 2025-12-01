@@ -28,6 +28,12 @@ export interface AddressTypeResponse {
     description: string;
 }
 
+// Permissions Types
+export interface PermissionsTypeResponse {
+    category: string;
+    permissions: string[];
+}
+
 /* ================= TYPE SERVICES ================= */
 
 /**
@@ -64,3 +70,10 @@ export const getDeviceAlertTypes = () =>
  */
 export const getAddressTypes = () =>
     apiClient.get<AddressTypeResponse[]>("/types/address-types");
+
+/**
+ * Fetch all available address types
+ * @returns Array of address type objects with type and label
+ */
+export const getPermissionsType = () =>
+    apiClient.get<PermissionsTypeResponse[]>("/permissions");

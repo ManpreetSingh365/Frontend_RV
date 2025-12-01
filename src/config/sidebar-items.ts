@@ -10,6 +10,10 @@ import {
   Settings,
   HelpCircle,
   Map,
+  Shield,
+  Building2,
+  CreditCard,
+  History,
 } from "lucide-react";
 
 // ---------- ICON MAP ----------
@@ -25,6 +29,10 @@ export const iconMap = {
   settings: Settings,
   help: HelpCircle,
   map: Map,
+  shield: Shield,
+  building: Building2,
+  creditCard: CreditCard,
+  history: History,
 } as const;
 
 // ---------- ROLE-BASED ITEMS ----------
@@ -44,14 +52,17 @@ export const getSidebarItems = (username?: string) => {
   const fleetManagement = {
     title: "FLEET MANAGEMENT",
     items: [
+      { name: "Organizations", icon: "building", path: `/panel/organization` },
+      { name: "Roles", icon: "shield", path: `/panel/roles` },
       { name: "Users", icon: "user", path: `/panel/users` },
-      { name: "Roles", icon: "", path: `/panel/roles` },
+      { name: "Vehicles", icon: "truck", path: `/panel/vehicle` },
+      { name: "Subscriptions Plans", icon: "creditCard", path: `/panel/subscription` },
+      { name: "Subscriptions History", icon: "history", path: `/panel/subscription-history` },
       {
         name: `User: ${username}`,
         icon: "user",
         path: `/panel/users/${username}`,
       },
-      { name: "Vehicles", icon: "truck", path: `/panel/vehicle` },
       { name: "Reports", icon: "chart", path: `/panel/report` },
       { name: "Maintenance", icon: "wrench", path: "/maintenance" },
     ],

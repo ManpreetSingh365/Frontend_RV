@@ -1,5 +1,4 @@
 import { apiClient } from "@/lib/api/api-client";
-import { User } from "./user.service";
 import type { CreateRoleInput, UpdateRoleInput } from "@/lib/validation/role.schema";
 
 /* ================= TYPE DEFINITIONS ================= */
@@ -11,6 +10,7 @@ export type Role = {
     active: boolean;
     organizationId: string | null;
     roleLevel: number;
+    assignedUserCount: number;
     roleScope: string;
     createdAt: string;
     updatedAt: string;

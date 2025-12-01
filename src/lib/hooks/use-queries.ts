@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRoles } from "@/lib/service/role.services";
 import { getVehicles } from "@/lib/service/vehicle.services";
-import { getAddressTypes } from "@/lib/service/type.services";
+import { getAddressTypes, getPermissionsType } from "@/lib/service/type.services";
 
 // Query Keys
 export const QUERY_KEYS = {
@@ -9,6 +9,7 @@ export const QUERY_KEYS = {
     vehicles: ["vehicles"],
     addressTypes: ["addressTypes"],
     users: ["users"],
+    permissions: ["permissions"],
 } as const;
 
 /**
@@ -39,6 +40,9 @@ export function useVehiclesQuery() {
 /**
  * Hook to fetch Address Types
  */
+/**
+ * Hook to fetch Address Types
+ */
 export function useAddressTypesQuery() {
     return useQuery({
         queryKey: QUERY_KEYS.addressTypes,
@@ -47,3 +51,18 @@ export function useAddressTypesQuery() {
         staleTime: 60 * 60 * 1000, // 1 hour (static data)
     });
 }
+
+/**
+ * Hook to fetch Permissions
+ */
+export function usePermissionsQuery() {
+    return useQuery({
+        queryKey: QUERY_KEYS.permissions,
+        queryFn: async () => {
+            const response = await getPermissionsType();
+            return response.data || [];
+        },
+        staleTime: 60 * 60 * 1000, // 1 hour (static data)
+    });
+}
+

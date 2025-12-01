@@ -7,6 +7,8 @@ import {
     array,
     optional,
     boolean,
+    number,
+    minValue,
 } from "valibot";
 
 /**
@@ -24,6 +26,10 @@ export const createRoleSchema = object({
             maxLength(255, "Description must not exceed 255 characters")
         )
     ),
+    roleLevel: pipe(
+        number(),
+        minValue(1, "Role level must be at least 1")
+    ),
     permissions: optional(array(string())),
     active: optional(boolean())
 });
@@ -31,6 +37,7 @@ export const createRoleSchema = object({
 export type CreateRoleInput = {
     name: string;
     description?: string;
+    roleLevel: number;
     permissions?: string[];
     active?: boolean;
 };
@@ -52,6 +59,12 @@ export const updateRoleSchema = object({
             maxLength(255, "Description must not exceed 255 characters")
         )
     ),
+    roleLevel: optional(
+        pipe(
+            number(),
+            minValue(1, "Role level must be at least 1")
+        )
+    ),
     permissions: optional(array(string())),
     active: optional(boolean())
 });
@@ -59,6 +72,7 @@ export const updateRoleSchema = object({
 export type UpdateRoleInput = {
     name?: string;
     description?: string;
+    roleLevel?: number;
     permissions?: string[];
     active?: boolean;
 };

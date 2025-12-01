@@ -13,10 +13,12 @@ export default async function UsersPage({
   const params = await searchParams;
 
   return (
-    <UsersList
-      initialPage={Number(params.page) || 1}
-      initialSearch={params.search || ""}
-      initialPageSize={Number(params.size) || 10}
-    />
+    <>
+      <UsersList
+        initialPage={Number(params.page) || 1}
+        initialSearch={params.search || ""}
+        initialPageSize={Number(params.size) || 10}
+      />
+    </>
   );
 }
