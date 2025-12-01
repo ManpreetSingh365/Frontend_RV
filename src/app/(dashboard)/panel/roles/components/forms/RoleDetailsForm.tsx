@@ -1,3 +1,4 @@
+import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -18,68 +19,69 @@ export function RoleDetailsForm({
     form,
     permissionCategories,
     loading,
-}: RoleDetailsFormProps) {
+    children
+}: RoleDetailsFormProps & { children?: React.ReactNode }) {
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b">
-                <h3 className="text-lg font-semibold">Role Details</h3>
+        <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-12">
+                <div className="md:col-span-6 space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <RequiredLabel>Role Name</RequiredLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter role name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="roleLevel"
+                        render={({ field }) => (
+                            <FormItem>
+                                <RequiredLabel>Role Level</RequiredLabel>
+                                <FormControl>
+                                    <Input
+                                        type="number"
+                                        min={1}
+                                        placeholder="Enter role level"
+                                        {...field}
+                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                <div className="md:col-span-4 space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="active"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm h-full">
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel>Active Status</FormLabel>
+                                    <FormDescription>
+                                        Enable or disable this role
+                                    </FormDescription>
+                                </div>
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                </div>
             </div>
-
-            <FieldRow>
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <RequiredLabel>Role Name</RequiredLabel>
-                            <FormControl>
-                                <Input placeholder="Enter role name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="roleLevel"
-                    render={({ field }) => (
-                        <FormItem>
-                            <RequiredLabel>Role Level</RequiredLabel>
-                            <FormControl>
-                                <Input
-                                    type="number"
-                                    min={1}
-                                    placeholder="Enter role level"
-                                    {...field}
-                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </FieldRow>
-
-            <FormField
-                control={form.control}
-                name="active"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                            <FormLabel>Active Status</FormLabel>
-                            <FormDescription>
-                                Enable or disable this role
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                    </FormItem>
-                )}
-            />
 
             <FormField
                 control={form.control}
@@ -121,6 +123,8 @@ export function RoleDetailsForm({
                     </FormItem>
                 )}
             />
+
+            {children}
         </div>
     );
 }

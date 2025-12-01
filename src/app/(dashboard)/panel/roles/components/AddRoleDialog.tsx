@@ -92,22 +92,22 @@ export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialog
                             form={form}
                             permissionCategories={permissionCategories}
                             loading={loading}
-                        />
-
-                        <div className="flex justify-end gap-3 pt-4 border-t">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setOpen(false)}
-                                disabled={isPending}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={isPending}>
-                                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Create Role
-                            </Button>
-                        </div>
+                        >
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setOpen(false)}
+                                    disabled={isPending}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={isPending}>
+                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Create Role
+                                </Button>
+                            </div>
+                        </RoleDetailsForm>
                     </form>
                 </Form>
             </DialogContent>

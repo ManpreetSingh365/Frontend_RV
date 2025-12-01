@@ -125,22 +125,22 @@ export default function UpdateRoleDialog({ roleId, open, onOpenChange, onRoleUpd
                                 form={form as unknown as UseFormReturn<CreateRoleInput>}
                                 permissionCategories={permissionCategories}
                                 loading={dataLoading}
-                            />
-
-                            <div className="flex justify-end gap-3 pt-4 border-t">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => onOpenChange(false)}
-                                    disabled={isPending}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="submit" disabled={isPending}>
-                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Update Role
-                                </Button>
-                            </div>
+                            >
+                                <div className="flex justify-end gap-3 pt-4 border-t">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => onOpenChange(false)}
+                                        disabled={isPending}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" disabled={isPending}>
+                                        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        Update Role
+                                    </Button>
+                                </div>
+                            </RoleDetailsForm>
                         </form>
                     </Form>
                 )}
