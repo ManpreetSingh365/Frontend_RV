@@ -15,6 +15,7 @@ const variantStyles: Record<StatusVariant, string> = {
     error: "border-red-600/40 bg-red-600/15 text-red-600",
     success: "border-green-600/40 bg-green-600/15 text-green-600",
     warning: "border-orange-500/40 bg-orange-500/15 text-orange-500",
+    default: "",
 };
 
 const dotStyles: Record<StatusVariant, string> = {
@@ -24,6 +25,7 @@ const dotStyles: Record<StatusVariant, string> = {
     error: "bg-red-600",
     success: "bg-green-600",
     warning: "bg-orange-500",
+    default: "",
 };
 
 /**

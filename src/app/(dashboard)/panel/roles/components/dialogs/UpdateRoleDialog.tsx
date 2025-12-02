@@ -11,11 +11,11 @@ import { toast } from "sonner";
 
 import { getRoleById, updateRole } from "@/lib/service/role.services";
 import { updateRoleSchema, type UpdateRoleInput, type CreateRoleInput } from "@/lib/validation/role.schema";
-import { RoleDetailsForm } from "./forms/RoleDetailsForm";
 import { EntityDialog } from "@/components/shared/dialogs/EntityDialog";
 import { useEntityForm } from "@/hooks/use-entity-form";
 import { handleApiFormErrors } from "@/lib/util/form-errors";
 import { useRoleData } from "@/lib/providers/role-data-provider";
+import { RoleDetailsForm } from "../forms/RoleDetailsForm";
 
 interface UpdateRoleDialogProps {
     roleId: string;

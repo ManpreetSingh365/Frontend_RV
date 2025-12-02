@@ -1,21 +1,10 @@
-import RolesList from "./RolesListComponent";
+import RolesList from "./RolesList";
+import { RoleDataProvider } from "@/lib/providers/role-data-provider";
 
-export default async function RolesPage({
-    searchParams,
-}: {
-    searchParams: Promise<{
-        page?: string;
-        size?: string;
-        search?: string;
-    }>;
-}) {
-    const params = await searchParams;
-
+export default function RolesPage() {
     return (
-        <RolesList
-            initialPage={Number(params.page) || 1}
-            initialSearch={params.search || ""}
-            initialPageSize={Number(params.size) || 10}
-        />
+        <RoleDataProvider>
+            <RolesList />
+        </RoleDataProvider>
     );
 }

@@ -68,3 +68,7 @@ export const deleteRole = (roleId: string) =>
 // HARD DELETE ROLE
 export const hardDeleteRole = (roleId: string) =>
     apiClient.delete<void>(`/role/hard/${roleId}`);
+
+// RESTORE ROLE
+export const restoreRole = (roleId: string) =>
+    apiClient.patch<any, Role>(`/role/restore/${roleId}`, {});

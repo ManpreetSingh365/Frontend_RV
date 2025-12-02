@@ -11,11 +11,11 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { getUserById, updateUser, type User } from "@/lib/service/user.service";
 import { updateUserSchema, type UpdateUserInput } from "@/lib/validation/user.schema";
-import { UpdateUserDetailsForm } from "./forms/UpdateUserDetailsForm";
-import { AddressForm } from "./forms/AddressForm";
 import { transformToComboboxOptions } from "@/lib/utils/entity-transforms";
 import { handleApiFormErrors } from "@/lib/util/form-errors";
 import { useUserData } from "@/lib/providers/user-data-provider";
+import { UpdateUserDetailsForm } from "../forms/UpdateUserDetailsForm";
+import { AddressForm } from "../forms/AddressForm";
 
 interface UpdateUserDialogProps {
     userId: string;

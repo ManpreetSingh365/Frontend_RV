@@ -3,30 +3,30 @@
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { usePagination, useDialogState } from "@/lib/hooks";
-import { FilterBar, ConfirmDialog, Badge } from "@/components/shared";
+import { FilterBar, ConfirmDialog } from "@/components/shared";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
-import { useUsersQuery, useRolesQuery } from "@/lib/hooks/use-queries";
+import { useRolesPaginatedQuery } from "@/lib/hooks/use-queries";
 import PageHeader from "./components/PageHeader";
-import UserTable from "./components/UserTable";
-import UpdateUserDialog from "./components/dialogs/UpdateUserDialog";
+import RoleTable from "./components/RoleTable";
+import UpdateRoleDialog from "./components/dialogs/UpdateRoleDialog";
 import type { FilterConfig } from "@/lib/types/entity";
 import { Button } from "@/components/ui/button";
-import { deleteUser, hardDeleteUser, restoreUser } from "@/lib/service/user.service";
+import { deleteRole, hardDeleteRole, restoreRole } from "@/lib/service/role.services";
 
-interface UsersListProps {
+interface RolesListProps {
     initialPage?: number;
     initialSearch?: string;
     initialPageSize?: number;
 }
 
-export default function UsersList({
+export default function RolesList({
     initialPage = 1,
     initialSearch = "",
     initialPageSize = 10,
-}: UsersListProps) {
+}: RolesListProps) {
     // State management with shared hooks
     const pagination = usePagination({
         initialPage,
@@ -34,13 +34,12 @@ export default function UsersList({
     });
 
     const [search, setSearch] = useState(initialSearch);
-    const [selectedRole, setSelectedRole] = useState("all");
     const [viewMode, setViewMode] = useState("hierarchy");
-    const [userToDelete, setUserToDelete] = useState<any | null>(null);
-    const [userToEdit, setUserToEdit] = useState<any | null>(null);
-    const [userToRestore, setUserToRestore] = useState<any | null>(null);
-    const [userToHardDelete, setUserToHardDelete] = useState<any | null>(null);
-    const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+    const [roleToDelete, setRoleToDelete] = useState<any | null>(null);
+    const [roleToEdit, setRoleToEdit] = useState<any | null>(null);
+    const [roleToRestore, setRoleToRestore] = useState<any | null>(null);
+    const [roleToHardDelete, setRoleToHardDelete] = useState<any | null>(null);
+    const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(new Set());
 
     const deleteDialog = useDialogState();
     const editDialog = useDialogState();
@@ -49,30 +48,19 @@ export default function UsersList({
     const bulkDeleteDialog = useDialogState();
 
     // Data fetching with TanStack Query
-    const { data, isLoading, isError, error, refetch } = useUsersQuery({
+    const { data, isLoading, isError, error, refetch } = useRolesPaginatedQuery({
         page: pagination.page,
         size: pagination.pageSize,
         search,
-        role: selectedRole === "all" ? "" : selectedRole,
         viewMode,
     });
 
-    // Fetch roles for filter
-    const { data: rolesList } = useRolesQuery({ size: 100 });
-
-    const users = data?.data || [];
+    const roles = data?.data || [];
     const meta = data?.meta;
 
     // Handle search with auto-reset to page 1
     const handleSearchChange = useCallback((value: string) => {
         setSearch(value);
-        pagination.setPage(1);
-    }, [pagination]);
-
-    // Handle role filter with auto-reset to page 1
-    const handleRoleChange = useCallback((value: string | string[]) => {
-        const roleValue = Array.isArray(value) ? value[0] : value;
-        setSelectedRole(roleValue);
         pagination.setPage(1);
     }, [pagination]);
 
@@ -83,28 +71,16 @@ export default function UsersList({
         pagination.setPage(1);
     }, [pagination]);
 
-    // ... (rest of handlers)
+    // Handle edit with dialog
+    const handleEditClick = useCallback((role: any) => {
+        setRoleToEdit(role);
+        editDialog.open();
+    }, [editDialog]);
 
-    // Handle selection change
-    const handleSelectionChange = useCallback((selectedIds: Set<string>) => {
-        setSelectedUserIds(selectedIds);
-    }, []);
+    // ... (rest of handlers)
 
     // Filter configuration
     const filters: FilterConfig[] = [
-        {
-            type: "select",
-            label: "Role",
-            value: selectedRole,
-            onChange: handleRoleChange,
-            options: [
-                { label: "All", value: "all" },
-                ...(Array.from(new Set(rolesList?.map((role: any) => role.name))).map((name: any) => ({
-                    label: name,
-                    value: name
-                })) || []),
-            ],
-        },
         {
             type: "select",
             label: "View Mode",
@@ -117,125 +93,125 @@ export default function UsersList({
             ],
         },
     ];
-    const handleEditClick = useCallback((user: any) => {
-        setUserToEdit(user);
-        editDialog.open();
-    }, [editDialog]);
 
     // Handle delete with confirmation
-    const handleDeleteClick = useCallback((user: any) => {
-        setUserToDelete(user);
+    const handleDeleteClick = useCallback((role: any) => {
+        setRoleToDelete(role);
         deleteDialog.open();
     }, [deleteDialog]);
 
     const handleDeleteConfirm = useCallback(async () => {
-        if (!userToDelete) return;
+        if (!roleToDelete) return;
 
         try {
-            const response = await deleteUser(userToDelete.id);
-            toast.success(response.message || "User deleted successfully");
+            // Implement delete logic here
+            const response = await deleteRole(roleToDelete.id);
+            toast.success(response.message || "Role deleted successfully");
             await refetch();
             deleteDialog.close();
-            setUserToDelete(null);
+            setRoleToDelete(null);
         } catch (error: any) {
             console.error("Delete failed:", error);
-            // Extract error message from API response
             const errorMessage = error?.response?.data?.messages?.[0] ||
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete user";
+                "Failed to delete role";
             toast.error(errorMessage);
         }
-    }, [userToDelete, refetch, deleteDialog]);
+    }, [roleToDelete, refetch, deleteDialog]);
 
     // Handle restore
-    const handleRestoreClick = useCallback((user: any) => {
-        setUserToRestore(user);
+    const handleRestoreClick = useCallback((role: any) => {
+        setRoleToRestore(role);
         restoreDialog.open();
     }, [restoreDialog]);
 
     const handleRestoreConfirm = useCallback(async () => {
-        if (!userToRestore) return;
+        if (!roleToRestore) return;
 
         try {
-            await restoreUser(userToRestore.id);
-            toast.success("User restored successfully");
+            await restoreRole(roleToRestore.id);
+            toast.success("Role restored successfully");
             await refetch();
             restoreDialog.close();
-            setUserToRestore(null);
+            setRoleToRestore(null);
         } catch (error: any) {
             console.error("Restore failed:", error);
             const errorMessage = error?.response?.data?.messages?.[0] ||
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to restore user";
+                "Failed to restore role";
             toast.error(errorMessage);
         }
-    }, [userToRestore, refetch, restoreDialog]);
+    }, [roleToRestore, refetch, restoreDialog]);
 
     // Handle hard delete
-    const handleHardDeleteClick = useCallback((user: any) => {
-        setUserToHardDelete(user);
+    const handleHardDeleteClick = useCallback((role: any) => {
+        setRoleToHardDelete(role);
         hardDeleteDialog.open();
     }, [hardDeleteDialog]);
 
     const handleHardDeleteConfirm = useCallback(async () => {
-        if (!userToHardDelete) return;
+        if (!roleToHardDelete) return;
 
         try {
-            await hardDeleteUser(userToHardDelete.id);
-            toast.success("User permanently deleted");
+            await hardDeleteRole(roleToHardDelete.id);
+            toast.success("Role permanently deleted");
             await refetch();
             hardDeleteDialog.close();
-            setUserToHardDelete(null);
+            setRoleToHardDelete(null);
         } catch (error: any) {
             console.error("Hard delete failed:", error);
             const errorMessage = error?.response?.data?.messages?.[0] ||
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to permanently delete user";
+                "Failed to permanently delete role";
             toast.error(errorMessage);
         }
-    }, [userToHardDelete, refetch, hardDeleteDialog]);
+    }, [roleToHardDelete, refetch, hardDeleteDialog]);
 
     // Handle bulk delete
     const handleBulkDelete = useCallback(() => {
-        if (selectedUserIds.size === 0) return;
+        if (selectedRoleIds.size === 0) return;
         bulkDeleteDialog.open();
-    }, [selectedUserIds, bulkDeleteDialog]);
+    }, [selectedRoleIds, bulkDeleteDialog]);
 
     const handleBulkDeleteConfirm = useCallback(async () => {
-        if (selectedUserIds.size === 0) return;
+        if (selectedRoleIds.size === 0) return;
 
         try {
             // Implement bulk delete logic here
-            await Promise.all(Array.from(selectedUserIds).map(id => deleteUser(id)));
-            toast.success(`Successfully deleted ${selectedUserIds.size} user(s)`);
+            await Promise.all(Array.from(selectedRoleIds).map(id => deleteRole(id)));
+            toast.success(`Successfully deleted ${selectedRoleIds.size} role(s)`);
             await refetch();
-            setSelectedUserIds(new Set());
+            setSelectedRoleIds(new Set());
             bulkDeleteDialog.close();
         } catch (error: any) {
             console.error("Bulk delete failed:", error);
             const errorMessage = error?.response?.data?.messages?.[0] ||
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete users";
+                "Failed to delete roles";
             toast.error(errorMessage);
         }
-    }, [selectedUserIds, refetch, bulkDeleteDialog]);
+    }, [selectedRoleIds, refetch, bulkDeleteDialog]);
+
+    // Handle selection change
+    const handleSelectionChange = useCallback((selectedIds: Set<string>) => {
+        setSelectedRoleIds(selectedIds);
+    }, []);
 
     // Loading state
     if (isLoading) {
         return (
             <div className="w-full max-w-full p-4 sm:p-6 md:p-8">
-                <PageHeader onUserCreated={refetch} />
+                <PageHeader onRoleCreated={refetch} />
                 <FilterBar
                     searchValue={search}
                     onSearchChange={handleSearchChange}
-                    searchPlaceholder="Search users by name, email..."
-                    filters={filters}
+                    searchPlaceholder="Search roles by name..."
                 />
-                <LoadingState rows={8} />
+                <LoadingState rows={6} />
             </div>
         );
     }
@@ -244,9 +220,9 @@ export default function UsersList({
     if (isError) {
         return (
             <div className="w-full max-w-full p-4 sm:p-6 md:p-8">
-                <PageHeader onUserCreated={refetch} />
+                <PageHeader onRoleCreated={refetch} />
                 <ErrorState
-                    title="Failed to load users"
+                    title="Failed to load roles"
                     message={(error as Error)?.message || "An error occurred"}
                     onRetry={() => refetch()}
                 />
@@ -255,14 +231,14 @@ export default function UsersList({
     }
 
     // Empty state
-    if (!users.length && !search && selectedRole === "all") {
+    if (!roles.length && !search) {
         return (
             <div className="w-full max-w-full p-4 sm:p-6 md:p-8">
-                <PageHeader onUserCreated={refetch} />
+                <PageHeader onRoleCreated={refetch} />
                 <EmptyState
-                    icon="users"
-                    title="No users yet"
-                    message="Get started by creating your first user"
+                    icon="shield"
+                    title="No roles yet"
+                    message="Get started by creating your first role"
                 />
             </div>
         );
@@ -272,7 +248,7 @@ export default function UsersList({
     return (
         <div className="w-full max-w-full p-4 sm:p-6 md:p-8">
             {/* Header */}
-            <PageHeader onUserCreated={refetch} />
+            <PageHeader onRoleCreated={refetch} />
 
             {/* Filters and Bulk Actions */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
@@ -280,80 +256,81 @@ export default function UsersList({
                     <FilterBar
                         searchValue={search}
                         onSearchChange={handleSearchChange}
-                        searchPlaceholder="Search by name, username, mobile or email..."
+                        searchPlaceholder="Search by role name or description..."
                         filters={filters}
                     />
                 </div>
-                {selectedUserIds.size > 0 && (
+                {selectedRoleIds.size > 0 && (
                     <Button
                         variant="destructive"
                         onClick={handleBulkDelete}
                         className="whitespace-nowrap"
                     >
-                        Delete Selected ({selectedUserIds.size})
+                        Delete Selected ({selectedRoleIds.size})
                     </Button>
                 )}
             </div>
 
             {/* Table Content */}
             <div>
-
                 {/* Table */}
-                {users.length === 0 ? (
-                    <EmptyState
-                        icon="search"
-                        title="No users found"
-                        message="Try adjusting your search or filters"
-                    />
-                ) : (
-                    <>
-                        <UserTable
-                            users={users}
-                            onDelete={handleDeleteClick}
-                            onEdit={handleEditClick}
-                            onSelectionChange={handleSelectionChange}
-                            onRestore={handleRestoreClick}
-                            onHardDelete={handleHardDeleteClick}
+                {
+                    roles.length === 0 ? (
+                        <EmptyState
+                            icon="search"
+                            title="No roles found"
+                            message="Try adjusting your search"
                         />
-
-                        {/* Pagination */}
-                        {meta && (
-                            <DataTablePagination
-                                currentPage={pagination.page}
-                                totalPages={meta.totalPages}
-                                totalItems={meta.totalElements}
-                                pageSize={pagination.pageSize}
-                                onPageChange={pagination.setPage}
-                                onPageSizeChange={pagination.setPageSize}
+                    ) : (
+                        <>
+                            <RoleTable
+                                roles={roles}
+                                onDelete={handleDeleteClick}
+                                onEdit={handleEditClick}
+                                onSelectionChange={handleSelectionChange}
+                                onRestore={handleRestoreClick}
+                                onHardDelete={handleHardDeleteClick}
                             />
-                        )}
-                    </>
-                )}
-            </div>
 
-            {/* Edit User Dialog */}
-            {userToEdit && (
-                <UpdateUserDialog
-                    userId={userToEdit.id}
-                    open={editDialog.isOpen}
-                    onOpenChange={editDialog.toggle}
-                    onUserUpdated={refetch}
-                />
-            )}
+                            {/* Pagination */}
+                            {meta && (
+                                <DataTablePagination
+                                    currentPage={pagination.page}
+                                    totalPages={meta.totalPages}
+                                    totalItems={meta.totalElements}
+                                    pageSize={pagination.pageSize}
+                                    onPageChange={pagination.setPage}
+                                    onPageSizeChange={pagination.setPageSize}
+                                />
+                            )}
+                        </>
+                    )
+                }
+            </div >
+
+            {/* Edit Role Dialog */}
+            {
+                roleToEdit && (
+                    <UpdateRoleDialog
+                        roleId={roleToEdit.id}
+                        open={editDialog.isOpen}
+                        onOpenChange={editDialog.toggle}
+                        onRoleUpdated={refetch}
+                    />
+                )
+            }
 
             {/* Delete Confirmation Dialog */}
             <ConfirmDialog
                 open={deleteDialog.isOpen}
                 onOpenChange={(isOpen) => isOpen ? deleteDialog.open() : deleteDialog.close()}
-                title="Delete User?"
+                title="Delete Role?"
                 description={
-                    userToDelete ? (
+                    roleToDelete ? (
                         <>
                             Are you sure you want to delete{" "}
-                            <span className="font-semibold">
-                                {userToDelete.firstName} {userToDelete.lastName}
-                            </span>
-                            ? This action cannot be undone.
+                            <span className="font-semibold">{roleToDelete.name}</span>? This
+                            action cannot be undone.
                         </>
                     ) : (
                         "This action cannot be undone."
@@ -368,18 +345,15 @@ export default function UsersList({
             <ConfirmDialog
                 open={restoreDialog.isOpen}
                 onOpenChange={(isOpen) => isOpen ? restoreDialog.open() : restoreDialog.close()}
-                title="Restore User?"
+                title="Restore Role?"
                 description={
-                    userToRestore ? (
+                    roleToRestore ? (
                         <>
                             Are you sure you want to restore{" "}
-                            <span className="font-semibold">
-                                {userToRestore.firstName} {userToRestore.lastName}
-                            </span>
-                            ?
+                            <span className="font-semibold">{roleToRestore.name}</span>?
                         </>
                     ) : (
-                        "Are you sure you want to restore this user?"
+                        "Are you sure you want to restore this role?"
                     )
                 }
                 onConfirm={handleRestoreConfirm}
@@ -391,15 +365,13 @@ export default function UsersList({
             <ConfirmDialog
                 open={hardDeleteDialog.isOpen}
                 onOpenChange={(isOpen) => isOpen ? hardDeleteDialog.open() : hardDeleteDialog.close()}
-                title="Permanently Delete User?"
+                title="Permanently Delete Role?"
                 description={
-                    userToHardDelete ? (
+                    roleToHardDelete ? (
                         <>
                             Are you sure you want to <span className="font-bold text-destructive">permanently delete</span>{" "}
-                            <span className="font-semibold">
-                                {userToHardDelete.firstName} {userToHardDelete.lastName}
-                            </span>
-                            ? This action <span className="font-bold">cannot be undone</span> and will remove all associated data.
+                            <span className="font-semibold">{roleToHardDelete.name}</span>?
+                            This action <span className="font-bold">cannot be undone</span>.
                         </>
                     ) : (
                         "This action cannot be undone."
@@ -414,11 +386,11 @@ export default function UsersList({
             <ConfirmDialog
                 open={bulkDeleteDialog.isOpen}
                 onOpenChange={(isOpen) => isOpen ? bulkDeleteDialog.open() : bulkDeleteDialog.close()}
-                title="Delete Multiple Users?"
+                title="Delete Multiple Roles?"
                 description={
                     <>
                         Are you sure you want to delete{" "}
-                        <span className="font-semibold">{selectedUserIds.size} user(s)</span>?
+                        <span className="font-semibold">{selectedRoleIds.size} role(s)</span>?
                         This action cannot be undone.
                     </>
                 }
@@ -426,6 +398,6 @@ export default function UsersList({
                 confirmText="Delete All"
                 variant="danger"
             />
-        </div>
+        </div >
     );
 }

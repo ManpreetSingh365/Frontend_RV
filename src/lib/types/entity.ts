@@ -109,7 +109,7 @@ export interface ActionConfig {
 // BADGE TYPES
 // ============================================================================
 
-export type StatusVariant = "active" | "inactive" | "pending" | "error" | "success" | "warning";
+export type StatusVariant = "active" | "inactive" | "pending" | "error" | "success" | "warning" | "default";
 
 export interface BadgeConfig {
     variant: StatusVariant;

@@ -58,7 +58,8 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleConfirm = async () => {
+    const handleConfirm = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
         setIsLoading(true);
         try {
             await onConfirm();

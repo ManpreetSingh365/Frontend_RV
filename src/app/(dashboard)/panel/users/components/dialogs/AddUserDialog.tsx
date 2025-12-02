@@ -9,15 +9,14 @@ import { Form } from "@/components/ui/form";
 import { AlertMessage } from "@/components/ui/alert-message";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
-
 import { createUser } from "@/lib/service/user.service";
 import { createUserSchema, type CreateUserInput } from "@/lib/validation/user.schema";
-import { UserDetailsForm } from "./forms/UserDetailsForm";
-import { AddressForm } from "./forms/AddressForm";
-import { INITIAL_USER_FORM_VALUES } from "../constants/form-defaults";
 import { handleApiFormErrors } from "@/lib/util/form-errors";
 import { useUserData } from "@/lib/providers/user-data-provider";
 import { transformToComboboxOptions } from "@/lib/utils/entity-transforms";
+import { INITIAL_USER_FORM_VALUES } from "../../constants/form-defaults";
+import { UserDetailsForm } from "../forms/UserDetailsForm";
+import { AddressForm } from "../forms/AddressForm";
 
 interface AddUserDialogProps {
     onUserCreated?: () => void;

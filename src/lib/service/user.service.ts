@@ -17,6 +17,7 @@ export type User = {
     createdBy: string;
     modifiedBy: string;
     vehiclesIds: string[];
+    vehicles?: any[];
     addresses: Array<{
         streetLine1: string;
         streetLine2?: string;
@@ -89,3 +90,7 @@ export const deleteUser = (userId: string) =>
 // HARD DELETE USER
 export const hardDeleteUser = (userId: string) =>
     apiClient.delete<void>(`/users/hard/${userId}`);
+
+// RESTORE USER
+export const restoreUser = (userId: string) =>
+    apiClient.patch<any, User>(`/users/restore/${userId}`, {});
