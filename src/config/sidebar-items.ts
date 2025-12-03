@@ -56,7 +56,7 @@ export const getSidebarItems = (username?: string) => {
       { name: "Roles", icon: "shield", path: `/panel/roles` },
       { name: "Users", icon: "user", path: `/panel/users` },
       { name: "Vehicles", icon: "truck", path: `/panel/vehicle` },
-      { name: "Subscriptions Plans", icon: "creditCard", path: `/panel/subscription` },
+      { name: "Subscriptions Plans", icon: "creditCard", path: `/panel/subscription-plans` },
       { name: "Subscriptions History", icon: "history", path: `/panel/subscription-history` },
       {
         name: `User: ${username}`,

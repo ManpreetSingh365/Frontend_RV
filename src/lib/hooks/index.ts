@@ -24,5 +24,6 @@ export {
     usePermissionsQuery,
     useUsersQuery,
     useOrganizationsQuery,
+    useSubscriptionPlansQuery,
     QUERY_KEYS,
 } from "./use-queries";

@@ -11,6 +11,7 @@ export const QUERY_KEYS = {
     users: ["users"],
     permissions: ["permissions"],
     organizations: ["organizations"],
+    subscriptionPlans: ["subscriptionPlans"],
 } as const;
 
 /**
@@ -100,6 +101,17 @@ export function useOrganizationsQuery(params: import("@/lib/service/organization
     return useQuery({
         queryKey: [...QUERY_KEYS.organizations, params],
         queryFn: () => import("@/lib/service/organization.service").then((mod) => mod.getOrganizations(params)),
+        placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
+    });
+}
+
+/**
+ * Hook to fetch Subscription Plans
+ */
+export function useSubscriptionPlansQuery(params: import("@/lib/service/subscription-plan.service").SubscriptionPlanQueryParams) {
+    return useQuery({
+        queryKey: [...QUERY_KEYS.subscriptionPlans, params],
+        queryFn: () => import("@/lib/service/subscription-plan.service").then((mod) => mod.getSubscriptionPlans(params)),
         placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
     });
 }
