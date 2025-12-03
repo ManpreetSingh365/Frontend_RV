@@ -11,6 +11,10 @@ export { useEntityCRUD } from "./use-entity-crud";
 export { useEntitySort } from "./use-entity-sort";
 export type { SortConfig, SortDirection } from "./use-entity-sort";
 
+// Export advanced feature hooks
+export { useColumnCustomization } from "./use-column-customization";
+export { useAdvancedFilters } from "./use-advanced-filters";
+
 // Re-export existing query hooks
 export {
     useRolesQuery,

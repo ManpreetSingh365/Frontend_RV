@@ -3,13 +3,13 @@
 import { useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { FilterBar, DataTable, ExportButton } from "@/components/shared";
+import { FilterBar, DataTable, ExportButton, ColumnCustomizer, AdvancedFilterDialog, VirtualDataTable } from "@/components/shared";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EntityCRUDDialogs } from "./EntityCRUDDialogs";
-import { useEntityList } from "@/lib/hooks";
+import { useEntityList, useColumnCustomization, useAdvancedFilters } from "@/lib/hooks";
 import type { EntityConfig } from "@/lib/types/entity-config";
 
 interface EntityListProps<T extends { id: string; active?: boolean }> {
@@ -83,7 +83,7 @@ export function EntityList<T extends { id: string; active?: boolean }>({
     const features = config.features || {};
 
     // Resolve columns - if it's a function, call it with handlers
-    const columns = useMemo(() => {
+    const allColumns = useMemo(() => {
         if (typeof config.columns === 'function') {
             return config.columns({
                 onEdit: handlers.onEdit,
@@ -94,6 +94,40 @@ export function EntityList<T extends { id: string; active?: boolean }>({
         }
         return config.columns;
     }, [config.columns, handlers, features]);
+
+    // Column customization
+    const columnCustomization = useColumnCustomization({
+        entityName: config.entityName,
+        columns: allColumns,
+        defaultVisible: features.defaultVisibleColumns,
+    });
+
+    // Use customized columns if feature is enabled, otherwise use all columns
+    const columns = features.columnCustomization
+        ? columnCustomization.visibleColumns
+        : allColumns;
+
+    // Advanced filtering
+    const advancedFilters = useAdvancedFilters({
+        entityName: config.entityName,
+    });
+
+    // Apply advanced filters to entities
+    const filteredEntities = useMemo(() => {
+        if (features.advancedFiltering && advancedFilters.hasActiveFilters) {
+            return advancedFilters.filterData(entities);
+        }
+        return entities;
+    }, [entities, advancedFilters, features.advancedFiltering]);
+
+    // Determine if virtual scrolling should be used
+    const useVirtualScrolling = useMemo(() => {
+        const threshold = features.virtualScrollingThreshold || 100;
+        return features.virtualScrolling && filteredEntities.length > threshold;
+    }, [features.virtualScrolling, features.virtualScrollingThreshold, filteredEntities.length]);
+
+    // Select appropriate table component
+    const TableComponent = useVirtualScrolling ? VirtualDataTable : DataTable;
 
     // Build filter configurations with dynamic data
     const filterConfigs = config.filters?.map((filter) => ({
@@ -209,7 +243,7 @@ export function EntityList<T extends { id: string; active?: boolean }>({
                 </div>
             </div>
 
-            {/* Filters and Bulk Actions */}
+            {/* Filters and Actions */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
                 <div className="flex-1 w-full">
                     <FilterBar
@@ -219,13 +253,43 @@ export function EntityList<T extends { id: string; active?: boolean }>({
                         filters={filterConfigs}
                     />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                    {/* Column Customization */}
+                    {features.columnCustomization && (
+                        <ColumnCustomizer
+                            columns={allColumns}
+                            visibleColumnIds={columnCustomization.visibleColumnIds}
+                            onToggleColumn={columnCustomization.toggleColumn}
+                            onReset={columnCustomization.resetColumns}
+                            hasCustomization={columnCustomization.hasCustomization}
+                        />
+                    )}
+
+                    {/* Advanced Filtering */}
+                    {features.advancedFiltering && (
+                        <AdvancedFilterDialog
+                            columns={allColumns}
+                            conditions={advancedFilters.conditions}
+                            logic={advancedFilters.logic}
+                            onConditionsChange={advancedFilters.setConditions}
+                            onLogicChange={advancedFilters.setLogic}
+                            onApply={() => { }}
+                            presets={advancedFilters.presets}
+                            onSavePreset={advancedFilters.savePreset}
+                            onLoadPreset={advancedFilters.loadPreset}
+                            onDeletePreset={advancedFilters.deletePreset}
+                        />
+                    )}
+
+                    {/* Export */}
                     <ExportButton
-                        data={entities}
+                        data={filteredEntities}
                         filename={config.entityNamePlural}
                         selectedIds={selectedIds}
                         disabled={isLoading}
                     />
+
+                    {/* Bulk Delete */}
                     {features.bulkOperations && selectedIds.size > 0 && (
                         <Button
                             variant="destructive"
@@ -240,7 +304,7 @@ export function EntityList<T extends { id: string; active?: boolean }>({
 
             {/* Table Content */}
             <div>
-                {entities.length === 0 ? (
+                {filteredEntities.length === 0 ? (
                     <EmptyState
                         icon="search"
                         title={`No ${config.entityNamePlural} found`}
@@ -248,12 +312,16 @@ export function EntityList<T extends { id: string; active?: boolean }>({
                     />
                 ) : (
                     <>
-                        <DataTable
+                        <TableComponent
                             columns={columns}
-                            data={entities}
+                            data={filteredEntities}
                             selectable={features.selection !== false}
                             onSelectionChange={handlers.onSelectionChange}
                             emptyMessage={`No ${config.entityNamePlural} found. Try adjusting your search or filters.`}
+                            {...(useVirtualScrolling && {
+                                estimatedItemSize: features.estimatedRowHeight || 60,
+                                containerHeight: features.virtualContainerHeight || "600px",
+                            })}
                         />
 
                         {/* Pagination */}

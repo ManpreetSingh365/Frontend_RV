@@ -15,6 +15,11 @@ export { EntityCRUDDialogs } from "./EntityCRUDDialogs";
 export { SortableHeader } from "./SortableHeader";
 export { ExportButton } from "./ExportButton";
 
+// Export advanced features
+export { ColumnCustomizer } from "./ColumnCustomizer";
+export { AdvancedFilterDialog } from "./AdvancedFilterDialog";
+export { VirtualDataTable } from "./VirtualDataTable";
+
 // Re-export types
 export type {
     StatusVariant,

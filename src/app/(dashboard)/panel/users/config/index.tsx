@@ -117,6 +117,15 @@ export function createUsersConfig(rolesData?: any[]): EntityConfig<User> {
             hardDelete: true,
             bulkOperations: true,
             selection: true,
+
+            // ✨ Advanced Features
+            columnCustomization: true,
+            defaultVisibleColumns: ["status", "username", "name", "mobile", "role", "vehicles", "credit", "createdBy", "createdAt", "lastLogin"],
+            advancedFiltering: true,
+            virtualScrolling: true,
+            virtualScrollingThreshold: 50,
+            estimatedRowHeight: 65,
+            virtualContainerHeight: "600px",
         },
 
         // Custom messages

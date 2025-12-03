@@ -103,6 +103,15 @@ export function createRolesConfig(): EntityConfig<Role> {
             hardDelete: true,
             bulkOperations: true,
             selection: true,
+
+            // ✨ Advanced Features
+            columnCustomization: true,
+            defaultVisibleColumns: ["status", "name", "description", "level", "users", "permissions", "createdAt"],
+            advancedFiltering: true,
+            virtualScrolling: true,
+            virtualScrollingThreshold: 50,
+            estimatedRowHeight: 60,
+            virtualContainerHeight: "600px",
         },
 
         // Custom messages

@@ -69,6 +69,20 @@ export interface EntityConfig<T extends { id: string; active?: boolean }> {
         bulkOperations?: boolean;
         /** Enable row selection */
         selection?: boolean;
+        /** Enable column customization (show/hide columns) */
+        columnCustomization?: boolean;
+        /** Default visible columns (if customization enabled) */
+        defaultVisibleColumns?: string[];
+        /** Enable advanced filtering */
+        advancedFiltering?: boolean;
+        /** Enable virtual scrolling for large datasets */
+        virtualScrolling?: boolean;
+        /** Threshold for activating virtual scrolling (default: 100) */
+        virtualScrollingThreshold?: number;
+        /** Estimated row height for virtual scrolling (default: 60px) */
+        estimatedRowHeight?: number;
+        /** Container height for virtual table (default: "600px") */
+        virtualContainerHeight?: string;
     };
     /** Custom messages */
     messages?: {
