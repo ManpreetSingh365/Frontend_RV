@@ -52,7 +52,7 @@ export const getSidebarItems = (username?: string) => {
   const fleetManagement = {
     title: "FLEET MANAGEMENT",
     items: [
-      { name: "Organizations", icon: "building", path: `/panel/organization` },
+      { name: "Organizations", icon: "building", path: `/panel/organizations` },
       { name: "Roles", icon: "shield", path: `/panel/roles` },
       { name: "Users", icon: "user", path: `/panel/users` },
       { name: "Vehicles", icon: "truck", path: `/panel/vehicle` },

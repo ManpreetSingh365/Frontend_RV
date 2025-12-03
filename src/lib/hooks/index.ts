@@ -23,5 +23,6 @@ export {
     useAddressTypesQuery,
     usePermissionsQuery,
     useUsersQuery,
+    useOrganizationsQuery,
     QUERY_KEYS,
 } from "./use-queries";

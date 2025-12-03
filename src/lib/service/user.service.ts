@@ -74,14 +74,8 @@ export const getUserById = (userId: string) =>
     apiClient.get<User>(`/users/${userId}`);
 
 // UPDATE USER
-export const updateUser = (
-    userId: string,
-    payload: UpdateUserInput
-) =>
-    apiClient.put<UpdateUserInput, User>(
-        `/users/${userId}`,
-        payload
-    );
+export const updateUser = (userId: string, payload: UpdateUserInput) =>
+    apiClient.put<UpdateUserInput, User>(`/users/${userId}`, payload);
 
 // SOFT DELETE USER
 export const deleteUser = (userId: string) =>

@@ -10,6 +10,7 @@ export const QUERY_KEYS = {
     addressTypes: ["addressTypes"],
     users: ["users"],
     permissions: ["permissions"],
+    organizations: ["organizations"],
 } as const;
 
 /**
@@ -92,3 +93,13 @@ export function useUsersQuery(params: import("@/lib/service/user.service").UserQ
     });
 }
 
+/**
+ * Hook to fetch Organizations
+ */
+export function useOrganizationsQuery(params: import("@/lib/service/organization.service").OrganizationQueryParams) {
+    return useQuery({
+        queryKey: [...QUERY_KEYS.organizations, params],
+        queryFn: () => import("@/lib/service/organization.service").then((mod) => mod.getOrganizations(params)),
+        placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
+    });
+}
