@@ -41,6 +41,7 @@ export interface SelectOption {
 }
 
 export interface FilterConfig {
+    id?: string; // Unique identifier for the filter
     type: FilterType;
     label: string;
     placeholder?: string;

@@ -81,8 +81,8 @@ export function FilterBar({
                                         <SelectValue placeholder={filter.placeholder} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {filter.options?.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
+                                        {filter.options?.map((option, optIndex) => (
+                                            <SelectItem key={`${index}-${optIndex}-${option.value}`} value={option.value}>
                                                 {option.label}
                                             </SelectItem>
                                         ))}

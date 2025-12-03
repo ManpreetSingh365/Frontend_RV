@@ -5,6 +5,12 @@ export { usePagination } from "./use-pagination";
 export { useDebounce } from "./use-debounce";
 export { useSelectOptions } from "./use-select-options";
 
+// Export generic entity management hooks
+export { useEntityList } from "./use-entity-list";
+export { useEntityCRUD } from "./use-entity-crud";
+export { useEntitySort } from "./use-entity-sort";
+export type { SortConfig, SortDirection } from "./use-entity-sort";
+
 // Re-export existing query hooks
 export {
     useRolesQuery,

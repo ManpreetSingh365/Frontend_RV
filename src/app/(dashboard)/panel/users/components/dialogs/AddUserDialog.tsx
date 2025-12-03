@@ -21,12 +21,23 @@ import { AddressForm } from "../forms/AddressForm";
 interface AddUserDialogProps {
     onUserCreated?: () => void;
     children?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export default function AddUserDialog({ onUserCreated, children }: AddUserDialogProps) {
-    const [open, setOpen] = useState(false);
+export default function AddUserDialog({
+    onUserCreated,
+    children,
+    open: externalOpen,
+    onOpenChange: externalOnOpenChange
+}: AddUserDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [globalError, setGlobalError] = useState("");
+
+    // Use external control if provided, otherwise use internal state
+    const open = externalOpen !== undefined ? externalOpen : internalOpen;
+    const setOpen = externalOnOpenChange || setInternalOpen;
 
     // Use centralized data from context - NO redundant API calls!
     const { roles, vehicles, addressTypes, loading } = useUserData();
@@ -81,14 +92,6 @@ export default function AddUserDialog({ onUserCreated, children }: AddUserDialog
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                {children || (
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add New User
-                    </Button>
-                )}
-            </DialogTrigger>
 
             <DialogContent className="max-h-[90vh] w-full overflow-y-auto !max-w-[1200px] sm:w-[95vw] md:w-[80vw] lg:w-[60vw] xl:w-[50vw]">
                 <DialogHeader>

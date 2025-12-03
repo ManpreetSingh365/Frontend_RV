@@ -9,6 +9,12 @@ export { DataTable } from "./DataTable";
 export { PageHeader } from "./PageHeader";
 export { EntityFilters } from "./EntityFilters";
 
+// Export generic entity components
+export { EntityList } from "./EntityList";
+export { EntityCRUDDialogs } from "./EntityCRUDDialogs";
+export { SortableHeader } from "./SortableHeader";
+export { ExportButton } from "./ExportButton";
+
 // Re-export types
 export type {
     StatusVariant,

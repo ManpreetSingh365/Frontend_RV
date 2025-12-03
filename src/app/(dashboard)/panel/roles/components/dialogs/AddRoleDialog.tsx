@@ -18,11 +18,22 @@ import { RoleDetailsForm } from "../forms/RoleDetailsForm";
 interface AddRoleDialogProps {
     onRoleCreated?: () => void;
     children?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
-export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialogProps) {
-    const [open, setOpen] = useState(false);
+export default function AddRoleDialog({
+    onRoleCreated,
+    children,
+    open: externalOpen,
+    onOpenChange: externalOnOpenChange
+}: AddRoleDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
     const { permissionCategories, loading } = useRoleData();
+
+    // Use external control if provided, otherwise use internal state
+    const open = externalOpen !== undefined ? externalOpen : internalOpen;
+    const setOpen = externalOnOpenChange || setInternalOpen;
 
     const form = useForm<CreateRoleInput>({
         resolver: valibotResolver(createRoleSchema),
@@ -43,14 +54,6 @@ export default function AddRoleDialog({ onRoleCreated, children }: AddRoleDialog
         <EntityDialog
             open={open}
             onOpenChange={setOpen}
-            trigger={
-                children || (
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add New Role
-                    </Button>
-                )
-            }
             title="Add New Role"
             description="Create a new role with specific permissions."
             maxWidth="lg"
