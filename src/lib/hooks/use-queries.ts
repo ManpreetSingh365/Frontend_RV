@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
     permissions: ["permissions"],
     organizations: ["organizations"],
     subscriptionPlans: ["subscriptionPlans"],
+    devices: ["devices"],
 } as const;
 
 /**
@@ -115,3 +116,26 @@ export function useSubscriptionPlansQuery(params: import("@/lib/service/subscrip
         placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
     });
 }
+
+/**
+ * Hook to fetch Devices
+ */
+export function useDevicesQuery(params: import("@/lib/service/device.service").DeviceQueryParams) {
+    return useQuery({
+        queryKey: [...QUERY_KEYS.devices, params],
+        queryFn: () => import("@/lib/service/device.service").then((mod) => mod.getDevices(params)),
+        placeholderData: (previousData) => previousData,
+    });
+}
+
+/**
+ * Hook to fetch Vehicles (paginated for entity list)
+ */
+export function useVehiclesPaginatedQuery(params: import("@/lib/service/vehicle.service").VehicleQueryParams) {
+    return useQuery({
+        queryKey: [...QUERY_KEYS.vehicles, "paginated", params],
+        queryFn: () => import("@/lib/service/vehicle.service").then((mod) => mod.getVehiclesPaginated(params)),
+        placeholderData: (previousData) => previousData,
+    });
+}
+

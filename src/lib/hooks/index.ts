@@ -20,10 +20,12 @@ export {
     useRolesQuery,
     useRolesPaginatedQuery,
     useVehiclesQuery,
+    useVehiclesPaginatedQuery,
     useAddressTypesQuery,
     usePermissionsQuery,
     useUsersQuery,
     useOrganizationsQuery,
     useSubscriptionPlansQuery,
+    useDevicesQuery,
     QUERY_KEYS,
 } from "./use-queries";

@@ -14,6 +14,7 @@ import {
   Building2,
   CreditCard,
   History,
+  LocateFixed,
 } from "lucide-react";
 
 // ---------- ICON MAP ----------
@@ -33,6 +34,7 @@ export const iconMap = {
   building: Building2,
   creditCard: CreditCard,
   history: History,
+  gps: LocateFixed,
 } as const;
 
 // ---------- ROLE-BASED ITEMS ----------
@@ -55,7 +57,8 @@ export const getSidebarItems = (username?: string) => {
       { name: "Organizations", icon: "building", path: `/panel/organizations` },
       { name: "Roles", icon: "shield", path: `/panel/roles` },
       { name: "Users", icon: "user", path: `/panel/users` },
-      { name: "Vehicles", icon: "truck", path: `/panel/vehicle` },
+      { name: "Devices", icon: "gps", path: `/panel/devices` },
+      { name: "Vehicles", icon: "truck", path: `/panel/vehicles` },
       { name: "Subscriptions Plans", icon: "creditCard", path: `/panel/subscription-plans` },
       { name: "Subscriptions History", icon: "history", path: `/panel/subscription-history` },
       {
