@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { getDeviceById, updateDevice } from "@/lib/service/device.service";
 import { DeviceForm, DeviceFormValues } from "../forms/DeviceForm";
-import { QUERY_KEYS } from "@/lib/hooks";
+import { QUERY_KEYS, useSimCategoriesQuery, useDeviceModelsQuery, useDeviceProtocolTypesQuery } from "@/lib/hooks";
 import { LoadingState } from "@/components/ui/loading-state";
 
 interface UpdateDeviceDialogProps {
@@ -41,6 +41,11 @@ export default function UpdateDeviceDialog({
         vehicleId: "",
     });
     const [errors, setErrors] = useState<Partial<Record<keyof DeviceFormValues, string>>>({});
+
+    // Fetch dropdown data
+    const { data: simCategories = [] } = useSimCategoriesQuery();
+    const { data: deviceModels = [] } = useDeviceModelsQuery();
+    const { data: protocolTypes = [] } = useDeviceProtocolTypesQuery();
 
     // Fetch device data
     const { data, isLoading } = useQuery({
@@ -82,8 +87,6 @@ export default function UpdateDeviceDialog({
         const newErrors: Partial<Record<keyof DeviceFormValues, string>> = {};
         if (!formValues.imei) newErrors.imei = "IMEI is required";
         if (!formValues.deviceModel) newErrors.deviceModel = "Device model is required";
-        if (!formValues.firmwareVersion) newErrors.firmwareVersion = "Firmware version is required";
-        if (!formValues.simNumber) newErrors.simNumber = "SIM number is required";
         if (!formValues.protocolType) newErrors.protocolType = "Protocol type is required";
         if (!formValues.simCategory) newErrors.simCategory = "SIM category is required";
 
@@ -105,7 +108,7 @@ export default function UpdateDeviceDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Device</DialogTitle>
                     <DialogDescription>
@@ -121,6 +124,9 @@ export default function UpdateDeviceDialog({
                         onChange={setFormValues}
                         errors={errors}
                         isUpdate
+                        deviceModels={deviceModels}
+                        simCategories={simCategories}
+                        protocolTypes={protocolTypes}
                     />
                 )}
 

@@ -1,5 +1,12 @@
+import { Metadata } from "next";
 import UsersList from "./UsersList";
 import { UserDataProvider } from "@/lib/providers/user-data-provider";
+
+export const metadata: Metadata = {
+  title: "Users | Dashboard",
+  description: "Manage users",
+};
+
 
 export default async function UsersPage({
   searchParams,

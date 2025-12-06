@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRoles } from "@/lib/service/role.services";
-import { getVehicles } from "@/lib/service/vehicle.services";
-import { getAddressTypes, getPermissionsType } from "@/lib/service/type.services";
+import { getAddressTypes, getPermissionsType, getSimCategories, getDeviceModels, getDeviceProtocolTypes } from "@/lib/service/type.services";
+import { getVehiclesPaginated } from "@/lib/service/vehicle.service";
 
 // Query Keys
 export const QUERY_KEYS = {
@@ -13,6 +13,9 @@ export const QUERY_KEYS = {
     organizations: ["organizations"],
     subscriptionPlans: ["subscriptionPlans"],
     devices: ["devices"],
+    simCategories: ["simCategories"],
+    deviceModels: ["deviceModels"],
+    deviceProtocolTypes: ["deviceProtocolTypes"],
 } as const;
 
 /**
@@ -48,7 +51,7 @@ export function useRolesPaginatedQuery(params?: import("@/lib/service/role.servi
 export function useVehiclesQuery() {
     return useQuery({
         queryKey: QUERY_KEYS.vehicles,
-        queryFn: () => getVehicles({}),
+        queryFn: () => getVehiclesPaginated({}),
         select: (response) => response.data || [],
         staleTime: 2 * 60 * 1000, // 2 minutes
     });
@@ -136,6 +139,65 @@ export function useVehiclesPaginatedQuery(params: import("@/lib/service/vehicle.
         queryKey: [...QUERY_KEYS.vehicles, "paginated", params],
         queryFn: () => import("@/lib/service/vehicle.service").then((mod) => mod.getVehiclesPaginated(params)),
         placeholderData: (previousData) => previousData,
+    });
+}
+
+/**
+ * Hook to fetch Vehicle Types
+ * Returns array formatted for SearchableCombobox
+ */
+export function useVehicleTypesQuery() {
+    return useQuery({
+        queryKey: ["vehicleTypes"],
+        queryFn: async () => {
+            const response = await import("@/lib/service/type.services").then((mod) => mod.getVehicleTypes());
+            // Transform to ComboboxOption format
+            return response.data?.map((type: any) => ({
+                value: type.name,
+                label: type.name,
+                description: `${type.category} - ${type.description}`,
+            })) || [];
+        },
+        staleTime: 60 * 60 * 1000, // 1 hour (static reference data)
+    });
+}
+
+/**
+ * Hook to fetch SIM Categories
+ * Returns array of SIM category strings (AIRTEL, VODAFONE, JIO, etc.)
+ */
+export function useSimCategoriesQuery() {
+    return useQuery({
+        queryKey: QUERY_KEYS.simCategories,
+        queryFn: () => getSimCategories(),
+        select: (response) => response.data?.simCategories || [],
+        staleTime: 60 * 60 * 1000, // 1 hour (static reference data)
+    });
+}
+
+/**
+ * Hook to fetch Device Models
+ * Returns array of device model strings (V5, SK05, TK103, etc.)
+ */
+export function useDeviceModelsQuery() {
+    return useQuery({
+        queryKey: QUERY_KEYS.deviceModels,
+        queryFn: () => getDeviceModels(),
+        select: (response) => response.data?.deviceModels || [],
+        staleTime: 60 * 60 * 1000, // 1 hour (static reference data)
+    });
+}
+
+/**
+ * Hook to fetch Device Protocol Types
+ * Returns array of protocol type strings (GT06, etc.)
+ */
+export function useDeviceProtocolTypesQuery() {
+    return useQuery({
+        queryKey: QUERY_KEYS.deviceProtocolTypes,
+        queryFn: () => getDeviceProtocolTypes(),
+        select: (response) => response.data?.deviceProtocolTypes || [],
+        staleTime: 60 * 60 * 1000, // 1 hour (static reference data)
     });
 }
 

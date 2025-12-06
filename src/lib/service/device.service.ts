@@ -30,11 +30,10 @@ export interface CreateDeviceInput {
     imei: string;
     deviceModel: string;
     protocolType: string;
-    simNumber: string;
+    simNumber?: string;
     simCategory: string;
-    firmwareVersion: string;
-    subscriptionPlanId: string;
-    paymentMethod: string;
+    firmwareVersion?: string;
+    subscriptionPlanId?: string;
 }
 
 export interface UpdateDeviceInput {

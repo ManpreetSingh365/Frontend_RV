@@ -14,8 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { getVehicleById, updateVehicle } from "@/lib/service/vehicle.service";
 import { VehicleForm, VehicleFormValues } from "../forms/VehicleForm";
-import { QUERY_KEYS, useDevicesQuery, useUsersQuery } from "@/lib/hooks";
+import { QUERY_KEYS, useDevicesQuery, useUsersQuery, useVehicleTypesQuery } from "@/lib/hooks";
 import { LoadingState } from "@/components/ui/loading-state";
+import { Smartphone, Signal, Calendar, Timer, AtSign, Shield, Phone } from "lucide-react";
 
 interface UpdateVehicleDialogProps {
     vehicleId: string;
@@ -54,15 +55,67 @@ export default function UpdateVehicleDialog({
 
     // Fetch devices for dropdown
     const { data: devicesData } = useDevicesQuery({ page: 1, size: 100 });
-    const devices = devicesData?.data?.map((device: any) => ({ id: device.id, imei: device.imei })) || [];
+    const deviceOptions = devicesData?.data?.map((device: any) => {
+        const details = [];
+
+        if (device.deviceModel)
+            details.push(<><Smartphone className="h-3 w-3" /> {device.deviceModel}</>);
+
+        if (device.simCategory)
+            details.push(<><Signal className="h-3 w-3" /> {device.simCategory}</>);
+
+        if (device.createdAt)
+            details.push(<><Calendar className="h-3 w-3" /> {new Date(device.createdAt).toLocaleDateString()}</>);
+
+        if (device.expiryAt)
+            details.push(<><Timer className="h-3 w-3" /> {new Date(device.expiryAt).toLocaleDateString()}</>);
+
+        return {
+            value: device.id,
+            label: device.imei,
+            description: details.length > 0 ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                    {details.map((detail, index) => (
+                        <span key={index} className="flex items-center gap-1">
+                            {detail}
+                        </span>
+                    ))}
+                </div>
+            ) : undefined
+        };
+    }) || [];
 
     // Fetch users for dropdown
     const { data: usersData } = useUsersQuery({ page: 1, size: 100 });
-    const users = usersData?.data?.map((user: any) => ({
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName
-    })) || [];
+    const userOptions = usersData?.data?.map((user: any) => {
+        const details = [];
+
+        if (user.username)
+            details.push(<><AtSign className="h-3 w-3" /> {user.username}</>);
+
+        if (user.role)
+            details.push(<><Shield className="h-3 w-3" /> {user.role}</>);
+
+        if (user.phoneNumber)
+            details.push(<><Phone className="h-3 w-3" /> {user.phoneNumber}</>);
+
+        return {
+            value: user.id,
+            label: `${user.firstName} ${user.lastName}`,
+            description: details.length > 0 ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                    {details.map((detail, index) => (
+                        <span key={index} className="flex items-center gap-1">
+                            {detail}
+                        </span>
+                    ))}
+                </div>
+            ) : undefined
+        };
+    }) || [];
+
+    // Fetch vehicle types for dropdown
+    const { data: vehicleTypes = [], isLoading: vehicleTypesLoading } = useVehicleTypesQuery();
 
     // Update form values when data is loaded
     useEffect(() => {
@@ -100,11 +153,6 @@ export default function UpdateVehicleDialog({
         const newErrors: Partial<Record<keyof VehicleFormValues, string>> = {};
         if (!formValues.licensePlate) newErrors.licensePlate = "License plate is required";
         if (!formValues.brand) newErrors.brand = "Brand is required";
-        if (!formValues.model) newErrors.model = "Model is required";
-        if (!formValues.year || formValues.year < 1900) newErrors.year = "Valid year is required";
-        if (!formValues.vin) newErrors.vin = "VIN is required";
-        if (!formValues.vehicleOwner) newErrors.vehicleOwner = "Vehicle owner is required";
-        if (!formValues.emergencyNumber) newErrors.emergencyNumber = "Emergency number is required";
         if (!formValues.vehicleType) newErrors.vehicleType = "Vehicle type is required";
 
         if (Object.keys(newErrors).length > 0) {
@@ -128,7 +176,7 @@ export default function UpdateVehicleDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Edit Vehicle</DialogTitle>
                     <DialogDescription>
@@ -143,8 +191,10 @@ export default function UpdateVehicleDialog({
                         values={formValues}
                         onChange={setFormValues}
                         errors={errors}
-                        devices={devices}
-                        users={users}
+                        deviceOptions={deviceOptions}
+                        userOptions={userOptions}
+                        vehicleTypes={vehicleTypes}
+                        loading={vehicleTypesLoading}
                     />
                 )}
 

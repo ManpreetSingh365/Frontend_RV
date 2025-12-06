@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { AlertMessage } from "@/components/ui/alert-message";
-import { Loader2 } from "lucide-react";
+import { Loader2, Car, Tag, User as UserIcon, MapPin, FileText, Users, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { getUserById, updateUser, type User } from "@/lib/service/user.service";
 import { updateUserSchema, type UpdateUserInput } from "@/lib/validation/user.schema";
@@ -33,14 +33,63 @@ export default function UpdateUserDialog({ userId, open, onOpenChange, onUserUpd
     const { roles, vehicles, addressTypes, loading: dataLoading } = useUserData();
 
     // Transform data to combobox options
-    const roleOptions = useMemo(() => transformToComboboxOptions(roles), [roles]);
-    const vehicleOptions = useMemo(() => transformToComboboxOptions(vehicles.map(v => ({
-        id: v.id,
-        name: `${v.licensePlate} (${v.brand} ${v.model})`
-    }))), [vehicles]);
-    const addressTypeOptions = useMemo(() => addressTypes.map(at => ({
+    const roleOptions = useMemo(() => roles.map((role: any) => {
+        const details = [];
+
+        if (role.description)
+            details.push(<><ShieldCheck className="h-3 w-3" /> {role.description}</>);
+
+        if (role.assignedUserCount !== undefined)
+            details.push(<><Users className="h-3 w-3" /> {role.assignedUserCount} users</>);
+
+        return {
+            value: role.id,
+            label: role.name,
+            description: details.length > 0 ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                    {details.map((detail, index) => (
+                        <span key={index} className="flex items-center gap-1">
+                            {detail}
+                        </span>
+                    ))}
+                </div>
+            ) : undefined
+        };
+    }), [roles]);
+    const vehicleOptions = useMemo(() => vehicles.map((v: any) => {
+        const details = [];
+
+        if (v.brand)
+            details.push(<><Car className="h-3 w-3" /> {v.brand}</>);
+
+        if (v.vehicleType)
+            details.push(<><Tag className="h-3 w-3" /> {v.vehicleType}</>);
+
+        if (v.vehicleOwner)
+            details.push(<><UserIcon className="h-3 w-3" /> {v.vehicleOwner}</>);
+
+        return {
+            value: v.id,
+            label: v.licensePlate,
+            description: details.length > 0 ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                    {details.map((detail, index) => (
+                        <span key={index} className="flex items-center gap-1">
+                            {detail}
+                        </span>
+                    ))}
+                </div>
+            ) : undefined
+        };
+    }), [vehicles]);
+    const addressTypeOptions = useMemo(() => addressTypes.map((at: any) => ({
         value: at.name,
-        label: at.description
+        label: at.name,
+        description: at.description ? (
+            <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> {at.description}
+            </div>
+        ) : undefined
     })), [addressTypes]);
 
     // Form setup

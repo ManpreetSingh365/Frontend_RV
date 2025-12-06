@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 export interface ComboboxOption {
     value: string;
     label: string;
-    description?: string;
+    description?: string | React.ReactNode;
 }
 
 interface SearchableComboboxProps {
@@ -45,7 +45,7 @@ export function SearchableCombobox({
         return options.filter(
             (option) =>
                 option.label.toLowerCase().includes(query) ||
-                option.description?.toLowerCase().includes(query)
+                (typeof option.description === 'string' && option.description.toLowerCase().includes(query))
         );
     }, [options, search]);
 
@@ -73,7 +73,7 @@ export function SearchableCombobox({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start">
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
                 <div className="p-2">
                     <Input
                         placeholder={searchPlaceholder}
@@ -82,7 +82,7 @@ export function SearchableCombobox({
                         className="h-9"
                     />
                 </div>
-                <div className="max-h-[300px] overflow-y-auto">
+                <div className="max-h-[300px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
                     {filteredOptions.length === 0 ? (
                         <div className="py-6 text-center text-sm text-muted-foreground">
                             {emptyMessage}
@@ -110,9 +110,9 @@ export function SearchableCombobox({
                                 <div className="flex flex-col">
                                     <span className="font-semibold">{option.label}</span>
                                     {option.description && (
-                                        <span className="text-xs text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground flex items-center gap-1">
                                             {option.description}
-                                        </span>
+                                        </div>
                                     )}
                                 </div>
                             </div>

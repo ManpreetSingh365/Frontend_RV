@@ -13,7 +13,7 @@ export default function OrganizationsList() {
     return (
         <EntityList
             config={config}
-            title="Organizations"
+            title="Organizations Management"
             description="Manage organizations in your system"
         />
     );

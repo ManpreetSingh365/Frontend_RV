@@ -9,7 +9,7 @@ export default function VehiclesList() {
     return (
         <EntityList
             config={config}
-            title="Vehicles"
+            title="Vehicles Management"
             description="Manage fleet vehicles and their assignments"
         />
     );

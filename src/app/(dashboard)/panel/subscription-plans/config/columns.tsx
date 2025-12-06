@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Pencil, Trash, Trash2, RotateCcw } from "lucide-react";
+import { MoreVertical, Pencil, Trash, Trash2, RotateCcw, IndianRupee } from "lucide-react";
 
 /**
  * Subscription Plan entity type
@@ -55,8 +55,9 @@ export function createSubscriptionPlanColumns(handlers: {
             id: "amount",
             header: "Amount",
             cell: (row) => (
-                <span className="text-sm font-semibold text-foreground">
-                    ₹{row.amount.toLocaleString()}
+                <span className="text-sm font-semibold text-foreground flex items-center justify-end gap-1">
+                    <IndianRupee className="h-4 w-4" />
+                    {row.amount.toLocaleString()}
                 </span>
             ),
             align: "right",

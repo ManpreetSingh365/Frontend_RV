@@ -9,7 +9,7 @@ export default function DevicesList() {
     return (
         <EntityList
             config={config}
-            title="Devices"
+            title="Devices Management"
             description="Manage GPS tracking devices"
         />
     );

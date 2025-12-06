@@ -30,14 +30,14 @@ export interface VehicleQueryParams {
 export interface CreateVehicleInput {
     licensePlate: string;
     brand: string;
-    model: string;
-    year: number;
-    vin: string;
-    vehicleOwner: string;
-    emergencyNumber: string;
+    model?: string;
+    year?: number;
+    vin?: string;
+    vehicleOwner?: string;
+    emergencyNumber?: string;
     vehicleType: string;
-    deviceId: string;
-    userIds: string[];
+    deviceId?: string;
+    userIds?: string[];
 }
 
 export interface UpdateVehicleInput {

@@ -31,7 +31,7 @@ export default function UsersList({
     return (
         <EntityList
             config={config}
-            title="Users"
+            title="Users Management"
             description="Manage system users and their permissions"
             initialPage={initialPage}
             initialSearch={initialSearch}

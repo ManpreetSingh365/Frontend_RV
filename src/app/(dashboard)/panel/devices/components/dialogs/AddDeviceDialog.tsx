@@ -12,9 +12,10 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Loader2, IndianRupee, Clock } from "lucide-react";
 import { createDevice } from "@/lib/service/device.service";
 import { DeviceForm, DeviceFormValues } from "../forms/DeviceForm";
-import { QUERY_KEYS, useSubscriptionPlansQuery } from "@/lib/hooks";
+import { QUERY_KEYS, useSubscriptionPlansQuery, useSimCategoriesQuery, useDeviceModelsQuery, useDeviceProtocolTypesQuery } from "@/lib/hooks";
 
 interface AddDeviceDialogProps {
     open: boolean;
@@ -36,13 +37,37 @@ export default function AddDeviceDialog({
         protocolType: "",
         simCategory: "",
         subscriptionPlanId: "",
-        paymentMethod: "",
     });
     const [errors, setErrors] = useState<Partial<Record<keyof DeviceFormValues, string>>>({});
 
-    // Fetch subscription plans for dropdown
+    // Fetch dropdown data
     const { data: plansData } = useSubscriptionPlansQuery({ page: 1, size: 100 });
-    const subscriptionPlans = plansData?.data?.map((plan: any) => ({ id: plan.id, name: plan.name })) || [];
+    const { data: simCategories = [] } = useSimCategoriesQuery();
+    const { data: deviceModels = [] } = useDeviceModelsQuery();
+    const { data: protocolTypes = [] } = useDeviceProtocolTypesQuery();
+    const subscriptionPlans = plansData?.data?.map((plan: any) => {
+        const details = [];
+
+        if (plan.amount !== undefined)
+            details.push(<><IndianRupee className="h-3 w-3" /> {plan.amount}</>);
+
+        if (plan.durationDays)
+            details.push(<><Clock className="h-3 w-3" /> {plan.durationDays} days</>);
+
+        return {
+            value: plan.id,
+            label: plan.name,
+            description: details.length > 0 ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                    {details.map((detail, index) => (
+                        <span key={index} className="flex items-center gap-1">
+                            {detail}
+                        </span>
+                    ))}
+                </div>
+            ) : undefined
+        };
+    }) || [];
 
     const createMutation = useMutation({
         mutationFn: createDevice,
@@ -60,7 +85,6 @@ export default function AddDeviceDialog({
                 protocolType: "",
                 simCategory: "",
                 subscriptionPlanId: "",
-                paymentMethod: "",
             });
             setErrors({});
         },
@@ -74,8 +98,6 @@ export default function AddDeviceDialog({
         const newErrors: Partial<Record<keyof DeviceFormValues, string>> = {};
         if (!formValues.imei) newErrors.imei = "IMEI is required";
         if (!formValues.deviceModel) newErrors.deviceModel = "Device model is required";
-        if (!formValues.firmwareVersion) newErrors.firmwareVersion = "Firmware version is required";
-        if (!formValues.simNumber) newErrors.simNumber = "SIM number is required";
         if (!formValues.protocolType) newErrors.protocolType = "Protocol type is required";
         if (!formValues.simCategory) newErrors.simCategory = "SIM category is required";
 
@@ -92,13 +114,12 @@ export default function AddDeviceDialog({
             protocolType: formValues.protocolType,
             simCategory: formValues.simCategory,
             subscriptionPlanId: formValues.subscriptionPlanId || "",
-            paymentMethod: formValues.paymentMethod || "",
         });
     };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Register New Device</DialogTitle>
                     <DialogDescription>
@@ -111,6 +132,9 @@ export default function AddDeviceDialog({
                     onChange={setFormValues}
                     errors={errors}
                     subscriptionPlans={subscriptionPlans}
+                    deviceModels={deviceModels}
+                    simCategories={simCategories}
+                    protocolTypes={protocolTypes}
                 />
 
                 <DialogFooter>

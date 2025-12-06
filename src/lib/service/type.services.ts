@@ -4,7 +4,9 @@ import { apiClient } from "@/lib/api/api-client";
 
 // Vehicle Types
 export interface VehicleTypeResponse {
-    vehicleTypes: string[];
+    name: string;
+    category: string;
+    description: string;
 }
 
 // SIM Categories
@@ -15,6 +17,11 @@ export interface SimCategoryResponse {
 // Device Models
 export interface DeviceModelResponse {
     deviceModels: string[];
+}
+
+// Device Protocol Types
+export interface DeviceProtocolTypeResponse {
+    deviceProtocolTypes: string[];
 }
 
 // Device Alert Types
@@ -38,10 +45,10 @@ export interface PermissionsTypeResponse {
 
 /**
  * Fetch all available vehicle types
- * @returns Array of vehicle type strings (CAR, TRUCK, VAN, etc.)
+ * @returns Array of vehicle type objects with name, category, and description
  */
 export const getVehicleTypes = () =>
-    apiClient.get<VehicleTypeResponse>("/types/vehicle-types");
+    apiClient.get<VehicleTypeResponse[]>("/types/vehicle-types");
 
 /**
  * Fetch all available SIM categories
@@ -56,6 +63,12 @@ export const getSimCategories = () =>
  */
 export const getDeviceModels = () =>
     apiClient.get<DeviceModelResponse>("/types/device-models");
+/**
+ * Fetch all supported device models
+ * @returns Array of device model strings
+ */
+export const getDeviceProtocolTypes = () =>
+    apiClient.get<DeviceProtocolTypeResponse>("/types/device-protocol-types");
 
 /**
  * Fetch all available device alert types

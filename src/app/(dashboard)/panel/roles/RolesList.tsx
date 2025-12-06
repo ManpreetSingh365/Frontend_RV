@@ -27,7 +27,7 @@ export default function RolesList({
     return (
         <EntityList
             config={config}
-            title="Roles"
+            title="Roles Management"
             description="Manage roles and permissions"
             initialPage={initialPage}
             initialSearch={initialSearch}
