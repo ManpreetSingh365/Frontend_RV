@@ -88,3 +88,10 @@ export const hardDeleteUser = (userId: string) =>
 // RESTORE USER
 export const restoreUser = (userId: string) =>
     apiClient.patch<any, User>(`/users/restore/${userId}`, {});
+
+// RESET PASSWORD
+export const resetPassword = (userId: string, newPassword: string) =>
+    apiClient.patch<{ newPassword: string }, { success: boolean; message: string }>(
+        `/users/reset-password/${userId}`,
+        { newPassword }
+    );

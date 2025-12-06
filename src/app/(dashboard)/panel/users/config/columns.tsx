@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Pencil, Trash, Trash2, RotateCcw } from "lucide-react";
+import { MoreVertical, Pencil, Trash, Trash2, RotateCcw, Key } from "lucide-react";
 
 /**
  * User entity type
@@ -39,6 +39,7 @@ export function createUserColumns(handlers: {
     onDelete: (user: User) => void;
     onRestore?: (user: User) => void;
     onHardDelete?: (user: User) => void;
+    onResetPassword?: (user: User) => void;
 }): ColumnDef<User>[] {
     return [
         {
@@ -174,6 +175,19 @@ export function createUserColumns(handlers: {
                             >
                                 <RotateCcw className="mr-2 h-4 w-4" />
                                 Restore
+                            </DropdownMenuItem>
+                        )}
+
+                        {handlers.onResetPassword && (
+                            <DropdownMenuItem
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlers.onResetPassword?.(row);
+                                }}
+                                className="cursor-pointer"
+                            >
+                                <Key className="mr-2 h-4 w-4" />
+                                Reset Password
                             </DropdownMenuItem>
                         )}
 
